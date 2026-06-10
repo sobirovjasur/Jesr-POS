@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "735158512346",
+    "project_id": "zirel-pos-app",
+    "storage_bucket": "zirel-pos-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735158512346:android:6962451a06968f603593e3",
+        "android_client_info": {
+          "package_name": "com.elriztechnology.flutter_pos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "735158512346-hor070fqhtd81k0obeih5nia7mbud27b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elriztechnology.flutter_pos",
+            "certificate_hash": "b9e3c297577267c97ce768c93699edae29a7b7c6"
+          }
+        },
+        {
+          "client_id": "735158512346-6ocf6qloqgq4npg2potn6abdvslavhrj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8QtdnZfy9PdOqEJmEKPbmkf-PPCwTogA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "735158512346-6ocf6qloqgq4npg2potn6abdvslavhrj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "735158512346-cf0kcnrkjerj4aq1o8mgqr9kk478e826.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "elriztechnology.com.flutterPos"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

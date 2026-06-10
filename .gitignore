@@ -37,9 +37,6 @@ migrate_working_dir/
 /build/
 
 # Secrets and env
-*.json
-!config.example.json
-lib/firebase_options.dart
 .env
 
 # Symbolication related
@@ -53,5 +50,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-# Local dart-define config (per-developer Firebase/OAuth values)
-config.json
