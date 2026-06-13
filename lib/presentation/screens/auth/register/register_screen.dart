@@ -12,7 +12,11 @@ import '../components/auth_password_field.dart';
 import '../components/auth_phone_field.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+  /// Full phone number (`+998...`) carried from the phone-entry step. When
+  /// provided, the phone field is hidden and this value is used for sign-up.
+  final String? phone;
+
+  const RegisterScreen({super.key, this.phone});
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
@@ -35,15 +39,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  bool get _hasPhone => widget.phone != null || _phoneController.text.trim().length == 9;
+
+  String get _fullPhone => widget.phone ?? AuthPhoneField.fullNumber(_phoneController.text.trim());
+
   bool get _isFilled =>
       _nameController.text.trim().isNotEmpty &&
-      _phoneController.text.trim().length == 9 &&
+      _hasPhone &&
       _passwordController.text.isNotEmpty &&
       _confirmController.text.isNotEmpty;
 
   String? _validate() {
     if (_nameController.text.trim().isEmpty) return 'Please enter your name.';
-    if (_phoneController.text.trim().length != 9) return 'Please enter a valid phone number.';
+    if (!_hasPhone) return 'Please enter a valid phone number.';
     if (_passwordController.text.length < 6) return 'Password must be at least 6 characters.';
     if (_passwordController.text != _confirmController.text) return 'Passwords do not match.';
 
@@ -62,7 +70,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     final res = await AppDialog.showProgress(() async {
       return authNotifier.signUp(
-        phone: AuthPhoneField.fullNumber(_phoneController.text.trim()),
+        phone: _fullPhone,
         password: _passwordController.text,
         name: _nameController.text.trim(),
       );
@@ -91,11 +99,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 hintText: 'Enter your name',
                 textInputAction: TextInputAction.next,
               ),
-              const SizedBox(height: AppSizes.padding),
-              AuthPhoneField(
-                controller: _phoneController,
-                labelText: 'Phone number',
-              ),
+              if (widget.phone == null) ...[
+                const SizedBox(height: AppSizes.padding),
+                AuthPhoneField(
+                  controller: _phoneController,
+                  labelText: 'Phone number',
+                ),
+              ],
               const SizedBox(height: AppSizes.padding),
               AuthPasswordField(
                 controller: _passwordController,

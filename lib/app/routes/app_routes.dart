@@ -7,6 +7,7 @@ import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
 import '../../presentation/screens/account/printer_settings_screen.dart';
 import '../../presentation/screens/account/profile_form_screen.dart';
+import '../../presentation/screens/auth/register/phone_number_screen.dart';
 import '../../presentation/screens/auth/register/register_screen.dart';
 import '../../presentation/screens/auth/sign_in/sign_in_screen.dart';
 import '../../presentation/screens/error/error_screen.dart';
@@ -79,6 +80,7 @@ class AppRoutes {
         _main(),
         _signIn(),
         _register(),
+        _registerDetails(),
         _error(),
       ],
     );
@@ -117,7 +119,16 @@ class AppRoutes {
     return GoRoute(
       path: '/register',
       builder: (context, state) {
-        return const RegisterScreen();
+        return const PhoneNumberScreen();
+      },
+    );
+  }
+
+  GoRoute _registerDetails() {
+    return GoRoute(
+      path: '/register-details',
+      builder: (context, state) {
+        return RegisterScreen(phone: state.extra as String?);
       },
     );
   }
