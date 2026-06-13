@@ -144,7 +144,7 @@ class _AppTextFieldState extends State<AppTextField> {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: widget.fontSize,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             cursorColor: Theme.of(context).colorScheme.primary,
             cursorWidth: 1.5,
@@ -161,7 +161,7 @@ class _AppTextFieldState extends State<AppTextField> {
               counterText: widget.showCounter ? null : '',
               isDense: true,
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surface,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
               prefixIcon: prefix(context),
               suffixIcon: suffix(context),
               hintText: widget.hintText,

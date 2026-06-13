@@ -108,8 +108,7 @@ class _ButtonChild extends StatelessWidget {
         Text(
           text ?? '',
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
             fontSize: fontSize,
             color: enabled
                 ? textColor ?? Theme.of(context).colorScheme.onPrimary

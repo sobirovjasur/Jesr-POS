@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/themes/app_radius.dart';
+
 class AppIconButton extends StatelessWidget {
   final double? width;
   final double? height;
@@ -17,7 +19,7 @@ class AppIconButton extends StatelessWidget {
     this.iconSize,
     this.padding = const EdgeInsets.all(12),
     this.enabled = true,
-    this.borderRadius = 100,
+    this.borderRadius = AppRadius.pill,
     required this.icon,
     required this.onTap,
   });
@@ -25,7 +27,7 @@ class AppIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(borderRadius),
       color: Colors.transparent,
       child: InkWell(
         onTap: enabled ? onTap : null,
