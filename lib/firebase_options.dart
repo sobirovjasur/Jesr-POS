@@ -49,11 +49,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC8QtdnZfy9PdOqEJmEKPbmkf-PPCwTogA',
-    appId: '1:735158512346:android:6962451a06968f603593e3',
-    messagingSenderId: '735158512346',
-    projectId: 'zirel-pos-app',
-    storageBucket: 'zirel-pos-app.firebasestorage.app',
+    apiKey: 'AIzaSyAUsG_kVtxyeUcP8aYaG0m2HN6X7O_akiw',
+    appId: '1:42401403459:android:ccbd74c5c032475048faf6',
+    messagingSenderId: '42401403459',
+    projectId: 'mobile-pos-app-b6c60',
+    storageBucket: 'mobile-pos-app-b6c60.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyA0bZ2U3KN3ZK0pvrTNM97iEGMUWoEgm64',
