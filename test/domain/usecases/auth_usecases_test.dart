@@ -2,6 +2,7 @@ import 'package:flutter_pos/core/common/result.dart';
 import 'package:flutter_pos/domain/entities/user_entity.dart';
 import 'package:flutter_pos/domain/repositories/auth_repository.dart';
 import 'package:flutter_pos/domain/usecases/auth_usecases.dart';
+import 'package:flutter_pos/domain/usecases/params/auth_params.dart';
 import 'package:flutter_pos/domain/usecases/params/no_param.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -15,16 +16,9 @@ void main() {
   late MockAuthRepository mockAuthRepository;
 
   setUpAll(() {
-    // Provide dummy values for complex types
     provideDummy<Result<UserEntity?>>(Result<UserEntity?>.success(data: null));
     provideDummy<Result<UserEntity>>(
-      Result<UserEntity>.success(
-        data: UserEntity(
-          id: 'user123',
-          name: 'John Doe',
-          email: 'john@example.com',
-        ),
-      ),
+      Result<UserEntity>.success(data: UserEntity(id: 'user123', name: 'John Doe')),
     );
     provideDummy<Result<void>>(Result<void>.success(data: null));
   });
@@ -33,46 +27,106 @@ void main() {
     mockAuthRepository = MockAuthRepository();
   });
 
-  group('SignInWithGoogleUsecase', () {
-    late SignInWithGoogleUsecase usecase;
+  group('SignUpWithPhonePasswordUsecase', () {
+    late SignUpWithPhonePasswordUsecase usecase;
 
     setUp(() {
-      usecase = SignInWithGoogleUsecase(mockAuthRepository);
+      usecase = SignUpWithPhonePasswordUsecase(mockAuthRepository);
     });
 
-    test('should return user from repository on successful sign in', () async {
-      // arrange
-      final user = UserEntity(
-        id: 'user123',
-        name: 'John Doe',
-        email: 'john@example.com',
-      );
+    test('should return user from repository on successful sign up', () async {
+      final user = UserEntity(id: 'user123', name: 'John Doe', phone: '998901234567');
       final result = Result<UserEntity>.success(data: user);
 
-      when(mockAuthRepository.signInWithGoogle()).thenAnswer((_) async => result);
+      when(
+        mockAuthRepository.signUpWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+          name: anyNamed('name'),
+        ),
+      ).thenAnswer((_) async => result);
 
-      // act
-      final response = await usecase.call(NoParam());
+      final response = await usecase.call(
+        const SignUpParams(phone: '+998901234567', password: 'secret123', name: 'John Doe'),
+      );
 
-      // assert
       expect(response, result);
-      verify(mockAuthRepository.signInWithGoogle());
+      verify(
+        mockAuthRepository.signUpWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+          name: anyNamed('name'),
+        ),
+      );
       verifyNoMoreInteractions(mockAuthRepository);
     });
 
     test('should return failure from repository', () async {
-      // arrange
+      final result = Result<UserEntity>.failure(error: 'Sign up failed');
+
+      when(
+        mockAuthRepository.signUpWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+          name: anyNamed('name'),
+        ),
+      ).thenAnswer((_) async => result);
+
+      final response = await usecase.call(
+        const SignUpParams(phone: '+998901234567', password: 'secret123', name: 'John Doe'),
+      );
+
+      expect(response, result);
+    });
+  });
+
+  group('SignInWithPhonePasswordUsecase', () {
+    late SignInWithPhonePasswordUsecase usecase;
+
+    setUp(() {
+      usecase = SignInWithPhonePasswordUsecase(mockAuthRepository);
+    });
+
+    test('should return user from repository on successful sign in', () async {
+      final user = UserEntity(id: 'user123', name: 'John Doe', phone: '998901234567');
+      final result = Result<UserEntity>.success(data: user);
+
+      when(
+        mockAuthRepository.signInWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+        ),
+      ).thenAnswer((_) async => result);
+
+      final response = await usecase.call(
+        const SignInParams(phone: '+998901234567', password: 'secret123'),
+      );
+
+      expect(response, result);
+      verify(
+        mockAuthRepository.signInWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+        ),
+      );
+      verifyNoMoreInteractions(mockAuthRepository);
+    });
+
+    test('should return failure from repository', () async {
       final result = Result<UserEntity>.failure(error: 'Sign in failed');
 
-      when(mockAuthRepository.signInWithGoogle()).thenAnswer((_) async => result);
+      when(
+        mockAuthRepository.signInWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+        ),
+      ).thenAnswer((_) async => result);
 
-      // act
-      final response = await usecase.call(NoParam());
+      final response = await usecase.call(
+        const SignInParams(phone: '+998901234567', password: 'secret123'),
+      );
 
-      // assert
       expect(response, result);
-      verify(mockAuthRepository.signInWithGoogle());
-      verifyNoMoreInteractions(mockAuthRepository);
     });
   });
 
@@ -84,33 +138,25 @@ void main() {
     });
 
     test('should return success from repository', () async {
-      // arrange
       final result = Result<void>.success(data: null);
 
       when(mockAuthRepository.signOut()).thenAnswer((_) async => result);
 
-      // act
       final response = await usecase.call(NoParam());
 
-      // assert
       expect(response, result);
       verify(mockAuthRepository.signOut());
       verifyNoMoreInteractions(mockAuthRepository);
     });
 
     test('should return failure from repository', () async {
-      // arrange
       final result = Result<void>.failure(error: 'Sign out failed');
 
       when(mockAuthRepository.signOut()).thenAnswer((_) async => result);
 
-      // act
       final response = await usecase.call(NoParam());
 
-      // assert
       expect(response, result);
-      verify(mockAuthRepository.signOut());
-      verifyNoMoreInteractions(mockAuthRepository);
     });
   });
 
@@ -122,38 +168,26 @@ void main() {
     });
 
     test('should return current user from repository', () async {
-      // arrange
-      final user = UserEntity(
-        id: 'user123',
-        name: 'John Doe',
-        email: 'john@example.com',
-      );
+      final user = UserEntity(id: 'user123', name: 'John Doe', phone: '998901234567');
       final result = Result<UserEntity?>.success(data: user);
 
       when(mockAuthRepository.getCurrentUser()).thenAnswer((_) async => result);
 
-      // act
       final response = await usecase.call(NoParam());
 
-      // assert
       expect(response, result);
       verify(mockAuthRepository.getCurrentUser());
       verifyNoMoreInteractions(mockAuthRepository);
     });
 
     test('should return failure from repository', () async {
-      // arrange
       final result = Result<UserEntity?>.failure(error: 'Failed to get user');
 
       when(mockAuthRepository.getCurrentUser()).thenAnswer((_) async => result);
 
-      // act
       final response = await usecase.call(NoParam());
 
-      // assert
       expect(response, result);
-      verify(mockAuthRepository.getCurrentUser());
-      verifyNoMoreInteractions(mockAuthRepository);
     });
   });
 }

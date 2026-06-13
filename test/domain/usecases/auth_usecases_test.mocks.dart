@@ -24,6 +24,7 @@ import 'package:mockito/src/dummies.dart' as _i6;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
 /// A class which mocks [AuthRepository].
 ///
@@ -34,13 +35,47 @@ class MockAuthRepository extends _i1.Mock implements _i2.AuthRepository {
   }
 
   @override
-  _i3.Future<_i4.Result<_i5.UserEntity>> signInWithGoogle() =>
+  _i3.Future<_i4.Result<_i5.UserEntity>> signUpWithPhonePassword({
+    required String? phone,
+    required String? password,
+    required String? name,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#signInWithGoogle, []),
+            Invocation.method(#signUpWithPhonePassword, [], {
+              #phone: phone,
+              #password: password,
+              #name: name,
+            }),
             returnValue: _i3.Future<_i4.Result<_i5.UserEntity>>.value(
               _i6.dummyValue<_i4.Result<_i5.UserEntity>>(
                 this,
-                Invocation.method(#signInWithGoogle, []),
+                Invocation.method(#signUpWithPhonePassword, [], {
+                  #phone: phone,
+                  #password: password,
+                  #name: name,
+                }),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Result<_i5.UserEntity>>);
+
+  @override
+  _i3.Future<_i4.Result<_i5.UserEntity>> signInWithPhonePassword({
+    required String? phone,
+    required String? password,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#signInWithPhonePassword, [], {
+              #phone: phone,
+              #password: password,
+            }),
+            returnValue: _i3.Future<_i4.Result<_i5.UserEntity>>.value(
+              _i6.dummyValue<_i4.Result<_i5.UserEntity>>(
+                this,
+                Invocation.method(#signInWithPhonePassword, [], {
+                  #phone: phone,
+                  #password: password,
+                }),
               ),
             ),
           )

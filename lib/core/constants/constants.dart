@@ -4,6 +4,14 @@ class Constants {
 
   static const googleServerClientId = String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID');
 
+  /// Default country dialing code prefixed to phone-based logins.
+  static const String phoneCountryCode = '+998';
+
+  /// Domain for the synthetic email derived from a phone number. Firebase
+  /// email/password auth backs the phone+password login, mapping each phone to
+  /// a deterministic `<digits>@<domain>` address (never shown to users).
+  static const String phoneAuthEmailDomain = 'pocketpos.app';
+
   static const String selectedDeviceIdKey = 'selected_device_id';
   static const String selectedConnectionTypeKey = 'selected_connection_type';
   static const String selectedPaperSizeKey = 'selected_paper_size';

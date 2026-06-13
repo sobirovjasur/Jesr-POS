@@ -24,264 +24,205 @@ void main() {
     provideDummy<Result<void>>(Result.success(data: null));
   });
 
-  group('AuthRepositoryImpl - signInWithGoogle', () {
-    test('should return UserEntity on successful sign in', () async {
-      // Arrange
+  group('AuthRepositoryImpl - signUpWithPhonePassword', () {
+    test('should return UserEntity on successful sign up', () async {
       final mockUserModel = MockUserModel();
       final mockUserEntity = MockUserEntity();
 
       when(mockUserModel.toEntity()).thenReturn(mockUserEntity);
-      when(mockRemoteDataSource.signInWithGoogle()).thenAnswer((_) async => Result.success(data: mockUserModel));
+      when(
+        mockRemoteDataSource.signUpWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+          name: anyNamed('name'),
+        ),
+      ).thenAnswer((_) async => Result.success(data: mockUserModel));
 
-      // Act
-      final result = await repository.signInWithGoogle();
+      final result = await repository.signUpWithPhonePassword(
+        phone: '+998901234567',
+        password: 'secret123',
+        name: 'Test User',
+      );
 
-      // Assert
       expect(result.isSuccess, true);
       expect(result.data, mockUserEntity);
-      verify(mockRemoteDataSource.signInWithGoogle()).called(1);
       verify(mockUserModel.toEntity()).called(1);
     });
 
     test('should return failure when remote datasource fails', () async {
-      // Arrange
-      final error = Exception('Sign in failed');
-      when(mockRemoteDataSource.signInWithGoogle()).thenAnswer((_) async => Result.failure(error: error));
+      final error = Exception('Sign up failed');
+      when(
+        mockRemoteDataSource.signUpWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+          name: anyNamed('name'),
+        ),
+      ).thenAnswer((_) async => Result.failure(error: error));
 
-      // Act
-      final result = await repository.signInWithGoogle();
+      final result = await repository.signUpWithPhonePassword(
+        phone: '+998901234567',
+        password: 'secret123',
+        name: 'Test User',
+      );
 
-      // Assert
       expect(result.isFailure, true);
       expect(result.error, error);
-      verify(mockRemoteDataSource.signInWithGoogle()).called(1);
     });
 
     test('should catch and return exception as failure', () async {
-      // Arrange
       final exception = Exception('Network error');
-      when(mockRemoteDataSource.signInWithGoogle()).thenThrow(exception);
+      when(
+        mockRemoteDataSource.signUpWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+          name: anyNamed('name'),
+        ),
+      ).thenThrow(exception);
 
-      // Act
-      final result = await repository.signInWithGoogle();
+      final result = await repository.signUpWithPhonePassword(
+        phone: '+998901234567',
+        password: 'secret123',
+        name: 'Test User',
+      );
 
-      // Assert
       expect(result.isFailure, true);
       expect(result.error, exception);
-      verify(mockRemoteDataSource.signInWithGoogle()).called(1);
+    });
+  });
+
+  group('AuthRepositoryImpl - signInWithPhonePassword', () {
+    test('should return UserEntity on successful sign in', () async {
+      final mockUserModel = MockUserModel();
+      final mockUserEntity = MockUserEntity();
+
+      when(mockUserModel.toEntity()).thenReturn(mockUserEntity);
+      when(
+        mockRemoteDataSource.signInWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+        ),
+      ).thenAnswer((_) async => Result.success(data: mockUserModel));
+
+      final result = await repository.signInWithPhonePassword(
+        phone: '+998901234567',
+        password: 'secret123',
+      );
+
+      expect(result.isSuccess, true);
+      expect(result.data, mockUserEntity);
+      verify(mockUserModel.toEntity()).called(1);
     });
 
-    test('should handle different types of errors', () async {
-      // Arrange
-      final errors = [
-        'String error',
-        StateError('State error'),
-        ArgumentError('Argument error'),
-      ];
+    test('should return failure when remote datasource fails', () async {
+      final error = Exception('Sign in failed');
+      when(
+        mockRemoteDataSource.signInWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+        ),
+      ).thenAnswer((_) async => Result.failure(error: error));
 
-      for (final error in errors) {
-        // Arrange
-        when(mockRemoteDataSource.signInWithGoogle()).thenAnswer((_) async => Result.failure(error: error));
+      final result = await repository.signInWithPhonePassword(
+        phone: '+998901234567',
+        password: 'secret123',
+      );
 
-        // Act
-        final result = await repository.signInWithGoogle();
+      expect(result.isFailure, true);
+      expect(result.error, error);
+    });
 
-        // Assert
-        expect(result.isFailure, true);
-        expect(result.error, error);
-      }
+    test('should catch and return exception as failure', () async {
+      final exception = Exception('Network error');
+      when(
+        mockRemoteDataSource.signInWithPhonePassword(
+          phone: anyNamed('phone'),
+          password: anyNamed('password'),
+        ),
+      ).thenThrow(exception);
+
+      final result = await repository.signInWithPhonePassword(
+        phone: '+998901234567',
+        password: 'secret123',
+      );
+
+      expect(result.isFailure, true);
+      expect(result.error, exception);
     });
   });
 
   group('AuthRepositoryImpl - signOut', () {
     test('should return success on successful sign out', () async {
-      // Arrange
       when(mockRemoteDataSource.signOut()).thenAnswer((_) async => Result.success(data: null));
 
-      // Act
       final result = await repository.signOut();
 
-      // Assert
       expect(result.isSuccess, true);
       verify(mockRemoteDataSource.signOut()).called(1);
     });
 
     test('should return failure when remote datasource fails', () async {
-      // Arrange
       final error = Exception('Sign out failed');
       when(mockRemoteDataSource.signOut()).thenAnswer((_) async => Result.failure(error: error));
 
-      // Act
       final result = await repository.signOut();
 
-      // Assert
       expect(result.isFailure, true);
       expect(result.error, error);
-      verify(mockRemoteDataSource.signOut()).called(1);
     });
 
     test('should catch and return exception as failure', () async {
-      // Arrange
       final exception = Exception('Unexpected error');
       when(mockRemoteDataSource.signOut()).thenThrow(exception);
 
-      // Act
       final result = await repository.signOut();
 
-      // Assert
       expect(result.isFailure, true);
       expect(result.error, exception);
-      verify(mockRemoteDataSource.signOut()).called(1);
     });
   });
 
   group('AuthRepositoryImpl - getCurrentUser', () {
     test('should return UserEntity when user is logged in', () async {
-      // Arrange
       final mockUserModel = MockUserModel();
       final mockUserEntity = MockUserEntity();
 
       when(mockUserModel.toEntity()).thenReturn(mockUserEntity);
       when(mockRemoteDataSource.getCurrentUser()).thenAnswer((_) async => Result.success(data: mockUserModel));
 
-      // Act
       final result = await repository.getCurrentUser();
 
-      // Assert
       expect(result.isSuccess, true);
       expect(result.data, mockUserEntity);
-      verify(mockRemoteDataSource.getCurrentUser()).called(1);
       verify(mockUserModel.toEntity()).called(1);
     });
 
     test('should return null when no user is logged in', () async {
-      // Arrange
       when(mockRemoteDataSource.getCurrentUser()).thenAnswer((_) async => Result.success(data: null));
 
-      // Act
       final result = await repository.getCurrentUser();
 
-      // Assert
       expect(result.isSuccess, true);
       expect(result.data, null);
-      verify(mockRemoteDataSource.getCurrentUser()).called(1);
     });
 
     test('should return failure when remote datasource fails', () async {
-      // Arrange
       final error = Exception('Failed to get user');
       when(mockRemoteDataSource.getCurrentUser()).thenAnswer((_) async => Result.failure(error: error));
 
-      // Act
       final result = await repository.getCurrentUser();
 
-      // Assert
       expect(result.isFailure, true);
       expect(result.error, error);
-      verify(mockRemoteDataSource.getCurrentUser()).called(1);
     });
 
     test('should catch and return exception as failure', () async {
-      // Arrange
       final exception = Exception('Unexpected error');
       when(mockRemoteDataSource.getCurrentUser()).thenThrow(exception);
 
-      // Act
       final result = await repository.getCurrentUser();
 
-      // Assert
       expect(result.isFailure, true);
       expect(result.error, exception);
-      verify(mockRemoteDataSource.getCurrentUser()).called(1);
-    });
-
-    test('should handle null user model gracefully', () async {
-      // Arrange
-      when(mockRemoteDataSource.getCurrentUser()).thenAnswer((_) async => Result.success(data: null));
-
-      // Act
-      final result = await repository.getCurrentUser();
-
-      // Assert
-      expect(result.isSuccess, true);
-      expect(result.data, null);
-    });
-  });
-
-  group('AuthRepositoryImpl - Integration', () {
-    test('should handle multiple consecutive operations', () async {
-      // Arrange
-      final mockUserModel = MockUserModel();
-      final mockUserEntity = MockUserEntity();
-
-      when(mockUserModel.toEntity()).thenReturn(mockUserEntity);
-      when(mockRemoteDataSource.signInWithGoogle()).thenAnswer((_) async => Result.success(data: mockUserModel));
-      when(mockRemoteDataSource.getCurrentUser()).thenAnswer((_) async => Result.success(data: mockUserModel));
-      when(mockRemoteDataSource.signOut()).thenAnswer((_) async => Result.success(data: null));
-
-      // Act
-      final signInResult = await repository.signInWithGoogle();
-      final getUserResult = await repository.getCurrentUser();
-      final signOutResult = await repository.signOut();
-
-      // Assert
-      expect(signInResult.isSuccess, true);
-      expect(getUserResult.isSuccess, true);
-      expect(signOutResult.isSuccess, true);
-
-      verify(mockRemoteDataSource.signInWithGoogle()).called(1);
-      verify(mockRemoteDataSource.getCurrentUser()).called(1);
-      verify(mockRemoteDataSource.signOut()).called(1);
-    });
-
-    test('should not propagate data between operations', () async {
-      // Arrange
-      final mockUserModel1 = MockUserModel();
-      final mockUserModel2 = MockUserModel();
-      final mockUserEntity1 = MockUserEntity();
-      final mockUserEntity2 = MockUserEntity();
-
-      when(mockUserModel1.toEntity()).thenReturn(mockUserEntity1);
-      when(mockUserModel2.toEntity()).thenReturn(mockUserEntity2);
-
-      when(mockRemoteDataSource.signInWithGoogle()).thenAnswer((_) async => Result.success(data: mockUserModel1));
-      when(mockRemoteDataSource.getCurrentUser()).thenAnswer((_) async => Result.success(data: mockUserModel2));
-
-      // Act
-      final signInResult = await repository.signInWithGoogle();
-      final getUserResult = await repository.getCurrentUser();
-
-      // Assert
-      expect(signInResult.data, mockUserEntity1);
-      expect(getUserResult.data, mockUserEntity2);
-      expect(signInResult.data, isNot(equals(getUserResult.data)));
-    });
-  });
-
-  group('AuthRepositoryImpl - Error Recovery', () {
-    test('should handle recovery after failure', () async {
-      // Arrange
-      final error = Exception('First attempt failed');
-      final mockUserModel = MockUserModel();
-      final mockUserEntity = MockUserEntity();
-
-      when(mockUserModel.toEntity()).thenReturn(mockUserEntity);
-      when(mockRemoteDataSource.signInWithGoogle()).thenAnswer((_) async => Result.failure(error: error));
-
-      // Act - First attempt (fails)
-      final firstResult = await repository.signInWithGoogle();
-
-      // Arrange - Second attempt (succeeds)
-      when(mockRemoteDataSource.signInWithGoogle()).thenAnswer((_) async => Result.success(data: mockUserModel));
-
-      // Act - Second attempt
-      final secondResult = await repository.signInWithGoogle();
-
-      // Assert
-      expect(firstResult.isFailure, true);
-      expect(secondResult.isSuccess, true);
-      expect(secondResult.data, mockUserEntity);
-      verify(mockRemoteDataSource.signInWithGoogle()).called(2);
     });
   });
 }

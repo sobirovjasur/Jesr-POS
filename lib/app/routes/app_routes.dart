@@ -7,6 +7,7 @@ import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
 import '../../presentation/screens/account/printer_settings_screen.dart';
 import '../../presentation/screens/account/profile_form_screen.dart';
+import '../../presentation/screens/auth/register/register_screen.dart';
 import '../../presentation/screens/auth/sign_in/sign_in_screen.dart';
 import '../../presentation/screens/error/error_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
@@ -56,7 +57,8 @@ class AppRoutes {
         final isChecking = authState.isChecking;
         final isAuthenticated = authState.isAuthenticated;
         final isSplashRoute = state.fullPath == '/';
-        final isAuthRoute = state.fullPath?.startsWith('/sign-in') ?? false;
+        final isAuthRoute =
+            (state.fullPath?.startsWith('/sign-in') ?? false) || (state.fullPath?.startsWith('/register') ?? false);
 
         if (isChecking) {
           return '/';
@@ -76,6 +78,7 @@ class AppRoutes {
         _splash(),
         _main(),
         _signIn(),
+        _register(),
         _error(),
       ],
     );
@@ -106,6 +109,15 @@ class AppRoutes {
       path: '/sign-in',
       builder: (context, state) {
         return const SignInScreen();
+      },
+    );
+  }
+
+  GoRoute _register() {
+    return GoRoute(
+      path: '/register',
+      builder: (context, state) {
+        return const RegisterScreen();
       },
     );
   }

@@ -53,9 +53,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // assert
-      expect(find.text('Welcome!'), findsOneWidget);
-      expect(find.text('Welcome to Flutter POS app'), findsOneWidget);
-      expect(find.text('Sign In With Google'), findsOneWidget);
+      expect(find.text('Authorization'), findsOneWidget);
+      expect(find.text('Login'), findsOneWidget);
+      expect(find.text('Password'), findsOneWidget);
+      expect(find.text('Sign in'), findsOneWidget);
+      expect(find.text('Register'), findsOneWidget);
     });
 
     testWidgets('should display sign in button', (tester) async {
@@ -64,7 +66,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // assert
-      final button = find.text('Sign In With Google');
+      final button = find.text('Sign in');
       expect(button, findsOneWidget);
     });
   });

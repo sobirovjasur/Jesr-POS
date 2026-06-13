@@ -1,10 +1,17 @@
-// lib/features/auth/domain/repositories/auth_repository.dart
-
 import '../../../../core/common/result.dart';
 import '../entities/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<Result<UserEntity>> signInWithGoogle();
+  Future<Result<UserEntity>> signUpWithPhonePassword({
+    required String phone,
+    required String password,
+    required String name,
+  });
+
+  Future<Result<UserEntity>> signInWithPhonePassword({
+    required String phone,
+    required String password,
+  });
 
   Future<Result<void>> signOut();
 

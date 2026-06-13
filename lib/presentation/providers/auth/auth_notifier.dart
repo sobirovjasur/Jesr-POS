@@ -4,6 +4,7 @@ import '../../../app/di/app_providers.dart';
 import '../../../core/common/result.dart';
 import '../../../core/utilities/console_logger.dart';
 import '../../../domain/usecases/auth_usecases.dart';
+import '../../../domain/usecases/params/auth_params.dart';
 import '../../../domain/usecases/params/no_param.dart';
 import '../../../domain/usecases/user_usecases.dart';
 import 'auth_state.dart';
@@ -33,14 +34,40 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  Future<Result<String>> signIn() async {
+  Future<Result<String>> signUp({
+    required String phone,
+    required String password,
+    required String name,
+  }) async {
     final authRepository = ref.read(authRepositoryProvider);
     final userRepository = ref.read(userRepositoryProvider);
 
-    var res = await SignInWithGoogleUsecase(authRepository).call(NoParam());
+    final res = await SignUpWithPhonePasswordUsecase(
+      authRepository,
+    ).call(SignUpParams(phone: phone, password: password, name: name));
     if (res.isFailure) return Result.failure(error: res.error!);
 
-    var createRes = await CreateUserUsecase(userRepository).call(res.data!);
+    final createRes = await CreateUserUsecase(userRepository).call(res.data!);
+    if (createRes.isFailure) return Result.failure(error: createRes.error!);
+
+    state = AuthState(user: res.data!);
+
+    return createRes;
+  }
+
+  Future<Result<String>> signIn({
+    required String phone,
+    required String password,
+  }) async {
+    final authRepository = ref.read(authRepositoryProvider);
+    final userRepository = ref.read(userRepositoryProvider);
+
+    final res = await SignInWithPhonePasswordUsecase(
+      authRepository,
+    ).call(SignInParams(phone: phone, password: password));
+    if (res.isFailure) return Result.failure(error: res.error!);
+
+    final createRes = await CreateUserUsecase(userRepository).call(res.data!);
     if (createRes.isFailure) return Result.failure(error: createRes.error!);
 
     state = AuthState(user: res.data!);

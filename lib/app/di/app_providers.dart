@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/services/connectivity/ping_service.dart';
@@ -45,7 +44,6 @@ final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) => FirebaseF
 final firebaseStorageProvider = Provider<FirebaseStorage>((ref) => FirebaseStorage.instance);
 final firebaseCrashlyticsProvider = Provider<FirebaseCrashlytics>((ref) => FirebaseCrashlytics.instance);
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
-final googleSignInProvider = Provider<GoogleSignIn>((ref) => GoogleSignIn.instance);
 final deviceInfoPluginProvider = Provider<DeviceInfoPlugin>((ref) => DeviceInfoPlugin());
 
 // Routes
@@ -83,7 +81,6 @@ final queuedActionLocalDatasourceProvider = Provider<QueuedActionLocalDatasource
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSourceImpl>(
   (ref) => AuthRemoteDataSourceImpl(
     firebaseAuth: ref.watch(firebaseAuthProvider),
-    googleSignIn: ref.watch(googleSignInProvider),
   ),
 );
 final storageRemoteDataSourceProvider = Provider<StorageRemoteDataSourceImpl>(

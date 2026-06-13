@@ -61,7 +61,7 @@ class _UserInfo extends ConsumerWidget {
           ),
           const SizedBox(height: AppSizes.padding / 4),
           Text(
-            user?.email ?? '',
+            user?.phone != null && user!.phone!.isNotEmpty ? '+${user.phone}' : (user?.email ?? ''),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],

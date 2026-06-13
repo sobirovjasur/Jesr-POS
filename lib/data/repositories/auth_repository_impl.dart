@@ -11,9 +11,35 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<Result<UserEntity>> signInWithGoogle() async {
+  Future<Result<UserEntity>> signUpWithPhonePassword({
+    required String phone,
+    required String password,
+    required String name,
+  }) async {
     try {
-      final res = await authRemoteDataSource.signInWithGoogle();
+      final res = await authRemoteDataSource.signUpWithPhonePassword(
+        phone: phone,
+        password: password,
+        name: name,
+      );
+      if (res.isFailure) return Result.failure(error: res.error!);
+
+      return Result.success(data: res.data!.toEntity());
+    } catch (e) {
+      return Result.failure(error: e);
+    }
+  }
+
+  @override
+  Future<Result<UserEntity>> signInWithPhonePassword({
+    required String phone,
+    required String password,
+  }) async {
+    try {
+      final res = await authRemoteDataSource.signInWithPhonePassword(
+        phone: phone,
+        password: password,
+      );
       if (res.isFailure) return Result.failure(error: res.error!);
 
       return Result.success(data: res.data!.toEntity());

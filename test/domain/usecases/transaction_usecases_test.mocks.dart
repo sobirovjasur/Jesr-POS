@@ -7,7 +7,8 @@ import 'dart:async' as _i3;
 
 import 'package:flutter_pos/core/common/result.dart' as _i4;
 import 'package:flutter_pos/domain/entities/transaction_entity.dart' as _i6;
-import 'package:flutter_pos/domain/repositories/transaction_repository.dart' as _i2;
+import 'package:flutter_pos/domain/repositories/transaction_repository.dart'
+    as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i5;
 
@@ -24,11 +25,13 @@ import 'package:mockito/src/dummies.dart' as _i5;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
 /// A class which mocks [TransactionRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockTransactionRepository extends _i1.Mock implements _i2.TransactionRepository {
+class MockTransactionRepository extends _i1.Mock
+    implements _i2.TransactionRepository {
   MockTransactionRepository() {
     _i1.throwOnMissingStub(this);
   }
@@ -125,22 +128,23 @@ class MockTransactionRepository extends _i1.Mock implements _i2.TransactionRepos
                 #contains: contains,
               },
             ),
-            returnValue: _i3.Future<_i4.Result<List<_i6.TransactionEntity>>>.value(
-              _i5.dummyValue<_i4.Result<List<_i6.TransactionEntity>>>(
-                this,
-                Invocation.method(
-                  #getUserTransactions,
-                  [userId],
-                  {
-                    #orderBy: orderBy,
-                    #sortBy: sortBy,
-                    #limit: limit,
-                    #offset: offset,
-                    #contains: contains,
-                  },
+            returnValue:
+                _i3.Future<_i4.Result<List<_i6.TransactionEntity>>>.value(
+                  _i5.dummyValue<_i4.Result<List<_i6.TransactionEntity>>>(
+                    this,
+                    Invocation.method(
+                      #getUserTransactions,
+                      [userId],
+                      {
+                        #orderBy: orderBy,
+                        #sortBy: sortBy,
+                        #limit: limit,
+                        #offset: offset,
+                        #contains: contains,
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
           )
           as _i3.Future<_i4.Result<List<_i6.TransactionEntity>>>);
 }
