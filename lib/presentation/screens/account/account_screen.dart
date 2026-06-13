@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../providers/auth/auth_notifier.dart';
 import '../../providers/main/main_notifier.dart';
-import '../../providers/theme/theme_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_snack_bar.dart';
@@ -24,7 +23,6 @@ class AccountScreen extends StatelessWidget {
           children: [
             _UserInfo(),
             _ProfileButton(),
-            _ThemeButton(),
             _PrinterSettingsButton(),
             _AboutButton(),
             _SignOutButton(),
@@ -113,52 +111,6 @@ class _ProfileButton extends StatelessWidget {
   }
 }
 
-class _ThemeButton extends StatelessWidget {
-  const _ThemeButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppButton(
-        buttonColor: Theme.of(context).colorScheme.surface,
-        borderColor: Theme.of(context).colorScheme.surfaceContainer,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.format_paint_outlined,
-                  size: 18,
-                ),
-                const SizedBox(width: AppSizes.padding / 1.5),
-                Text(
-                  'Theme',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 18,
-            ),
-          ],
-        ),
-        onTap: () {
-          AppDialog.show(
-            title: 'Theme',
-            leftButtonText: 'Close',
-            child: const _ThemeDialogBody(),
-          );
-        },
-      ),
-    );
-  }
-}
-
 class _PrinterSettingsButton extends StatelessWidget {
   const _PrinterSettingsButton();
 
@@ -239,33 +191,6 @@ class _AboutButton extends StatelessWidget {
           context.go('/account/about');
         },
       ),
-    );
-  }
-}
-
-class _ThemeDialogBody extends ConsumerWidget {
-  const _ThemeDialogBody();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final themeState = ref.watch(themeNotifierProvider);
-
-    return Row(
-      children: [
-        Switch(
-          value: !themeState.isLight,
-          onChanged: (val) {
-            ref.read(themeNotifierProvider.notifier).changeBrightness(!val);
-          },
-        ),
-        const SizedBox(width: AppSizes.padding),
-        Text(
-          'Dark Mode',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
     );
   }
 }

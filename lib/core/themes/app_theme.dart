@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
+import 'app_radius.dart';
 import 'app_sizes.dart';
+import 'app_typography.dart';
 
+/// Application theme (Figma Draft — purple + neutral, light-only).
+///
+/// The color scheme is built explicitly (not via `ColorScheme.fromSeed`) so the
+/// neutral design tokens map 1:1 to Material slots. Every existing
+/// `Theme.of(context).colorScheme.*` read therefore picks up the redesign with
+/// no per-screen change. Dark mode was intentionally removed.
 class AppTheme {
   // Make [AppTheme] to be singleton
   static final AppTheme _instance = AppTheme._();
@@ -12,13 +19,8 @@ class AppTheme {
 
   AppTheme._();
 
-  Color _primaryColor = AppColors.orange;
-  Color? _secondaryColor = AppColors.charcoal;
-  Color? _tertiaryColor = AppColors.plum;
-  Brightness _brightness = Brightness.light;
-  TextTheme _primaryTextTheme = GoogleFonts.latoTextTheme();
-  TextTheme _secondaryTextTheme = GoogleFonts.poppinsTextTheme();
-
+  /// Builds the light theme. [brightness] is accepted for backward
+  /// compatibility but ignored — the app is light-only.
   ThemeData init({
     Color? primaryColor,
     Color? secondaryColor,
@@ -28,68 +30,75 @@ class AppTheme {
     TextTheme? primaryTextTheme,
     TextTheme? secondaryTextTheme,
   }) {
-    _primaryColor = primaryColor ?? _primaryColor;
-    _secondaryColor = secondaryColor ?? _secondaryColor;
-    _tertiaryColor = tertiaryColor ?? _tertiaryColor;
-    _brightness = brightness ?? _brightness;
-    _primaryTextTheme = primaryTextTheme ?? _primaryTextTheme;
-    _secondaryTextTheme = secondaryTextTheme ?? _secondaryTextTheme;
-
-    return _base(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: _primaryColor,
-        brightness: _brightness,
-        primary: _primaryColor,
-        secondary: _secondaryColor,
-        tertiary: _tertiaryColor,
-      ),
-      brightness: _brightness,
-      primaryTextTheme: _primaryTextTheme,
-      secondaryTextTheme: _secondaryTextTheme,
-    );
+    return _base(_lightScheme);
   }
 
-  ThemeData _base({
-    required ColorScheme colorScheme,
-    required Brightness brightness,
-    required TextTheme primaryTextTheme,
-    required TextTheme secondaryTextTheme,
-  }) {
-    final textTheme = primaryTextTheme.copyWith(
-      displaySmall: secondaryTextTheme.displaySmall,
-      displayMedium: secondaryTextTheme.displayMedium,
-      displayLarge: secondaryTextTheme.displayLarge,
-      headlineSmall: secondaryTextTheme.headlineSmall,
-      headlineMedium: secondaryTextTheme.headlineMedium,
-      headlineLarge: secondaryTextTheme.headlineLarge,
+  /// Explicit light color scheme mapping design tokens to Material slots.
+  static const ColorScheme _lightScheme = ColorScheme(
+    brightness: Brightness.light,
+    primary: AppColors.primary,
+    onPrimary: AppColors.onPrimary,
+    primaryContainer: Color(0xFFF1E2FC),
+    onPrimaryContainer: AppColors.primary,
+    secondary: AppColors.primary,
+    onSecondary: AppColors.onPrimary,
+    secondaryContainer: Color(0xFFF1E2FC),
+    onSecondaryContainer: AppColors.primary,
+    tertiary: AppColors.textSecondary,
+    onTertiary: AppColors.onPrimary,
+    error: AppColors.error,
+    onError: AppColors.onPrimary,
+    errorContainer: Color(0xFFFCE8E9),
+    onErrorContainer: AppColors.error,
+    surface: AppColors.surface,
+    onSurface: AppColors.textPrimary,
+    onSurfaceVariant: AppColors.textSecondary,
+    outline: AppColors.textSecondary,
+    outlineVariant: AppColors.textTertiary,
+    shadow: Color(0xFF000000),
+    scrim: Color(0xFF000000),
+    inverseSurface: AppColors.textPrimary,
+    onInverseSurface: AppColors.surface,
+    inversePrimary: Color(0xFFE0B6F8),
+    surfaceTint: AppColors.primary,
+    // Neutral surface ramp — backs scaffolds, fields, dividers, borders.
+    surfaceDim: AppColors.border,
+    surfaceBright: AppColors.surface,
+    surfaceContainerLowest: AppColors.surface,
+    surfaceContainerLow: AppColors.surfaceSubtle,
+    surfaceContainer: AppColors.surfaceSubtle,
+    surfaceContainerHigh: AppColors.surfaceAlt,
+    surfaceContainerHighest: AppColors.border,
+  );
+
+  ThemeData _base(ColorScheme colorScheme) {
+    final textTheme = AppTypography.textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+      decorationColor: colorScheme.onSurface,
     );
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      brightness: brightness,
+      brightness: Brightness.light,
+      fontFamily: AppTypography.fontFamily,
       visualDensity: VisualDensity.adaptivePlatformDensity,
       scaffoldBackgroundColor: colorScheme.surfaceContainerLowest,
-      textTheme: textTheme.apply(
-        bodyColor: colorScheme.onSurface,
-        displayColor: colorScheme.onSurface,
-        decorationColor: colorScheme.onSurface,
-      ),
+      textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surfaceContainerLowest,
-        shadowColor: colorScheme.surfaceContainerHighest,
-        elevation: 0.5,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: colorScheme.outlineVariant,
+        elevation: 0,
         scrolledUnderElevation: 0.5,
         titleSpacing: AppSizes.padding,
-        titleTextStyle: textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: colorScheme.onSurface,
-        ),
+        titleTextStyle: textTheme.titleMedium?.copyWith(color: colorScheme.onSurface),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       tabBarTheme: TabBarThemeData(
-        labelColor: colorScheme.onSurface,
-        unselectedLabelColor: colorScheme.onSurface,
+        labelColor: colorScheme.primary,
+        unselectedLabelColor: colorScheme.onSurfaceVariant,
         indicator: BoxDecoration(
           border: Border(
             bottom: BorderSide(color: colorScheme.primary, width: 2),
@@ -97,41 +106,47 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: colorScheme.secondaryContainer,
-        foregroundColor: colorScheme.onSecondaryContainer,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: colorScheme.surface,
-        selectedIconTheme: IconThemeData(color: colorScheme.onSecondaryContainer),
-        indicatorColor: colorScheme.secondaryContainer,
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        indicatorColor: colorScheme.primaryContainer,
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surfaceContainer,
+        side: BorderSide.none,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.pillAll),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colorScheme.surfaceContainerLowest,
         selectedItemColor: colorScheme.primary,
-        unselectedItemColor: colorScheme.outline,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, fontSize: 10),
-        unselectedLabelStyle: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, fontSize: 10),
+        elevation: 0,
+        selectedLabelStyle: textTheme.labelSmall,
+        unselectedLabelStyle: textTheme.labelSmall,
       ),
       dividerTheme: DividerThemeData(
-        color: colorScheme.surfaceDim,
+        color: colorScheme.surfaceContainerHighest,
         thickness: 0.5,
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: colorScheme.primary,
-        contentTextStyle: textTheme.labelSmall?.copyWith(
-          color: colorScheme.surface,
-          fontWeight: FontWeight.w600,
-        ),
+        contentTextStyle: textTheme.labelSmall?.copyWith(color: colorScheme.onPrimary),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.cardAll),
         showCloseIcon: true,
         elevation: 1,
       ),
-      dialogTheme: DialogThemeData(backgroundColor: colorScheme.surfaceContainerLowest),
+      dialogTheme: DialogThemeData(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.cardAll),
+      ),
     );
   }
 }

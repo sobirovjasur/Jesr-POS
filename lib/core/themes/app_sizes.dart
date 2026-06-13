@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_radius.dart';
+
 /// Custom size for common used sizes (e.g. padding)
 class AppSizes {
   // Prevents instantiation and extension
@@ -7,7 +9,10 @@ class AppSizes {
 
   static const double margin = 18;
   static const double padding = 18;
-  static const double radius = 8;
+
+  /// Default surface radius. Now delegates to [AppRadius.card] (12) per the
+  /// redesign; existing call sites pick up the new value automatically.
+  static const double radius = AppRadius.card;
 
   static Size size(BuildContext context) => MediaQuery.sizeOf(context);
   static double screenWidth(BuildContext context) => MediaQuery.sizeOf(context).width;
