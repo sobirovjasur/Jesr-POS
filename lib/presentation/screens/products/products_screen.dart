@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../providers/products/products_notifier.dart';
@@ -145,7 +146,7 @@ class _AddButton extends StatelessWidget {
       padding: const EdgeInsets.only(right: AppSizes.padding),
       child: AppButton(
         height: 26,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: AppRadius.smallAll,
         padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
         buttonColor: Theme.of(context).colorScheme.surfaceContainer,
         child: Row(

@@ -2,6 +2,7 @@ import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../../core/utilities/currency_formatter.dart';
 import '../../../widgets/app_button.dart';
@@ -85,7 +86,10 @@ class _OrderCardState extends State<OrderCard> {
                           children: [
                             Text(
                               CurrencyFormatter.format(widget.price),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -111,7 +115,7 @@ class _OrderCardState extends State<OrderCard> {
                                 padding: EdgeInsets.zero,
                                 buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                                 borderColor: Theme.of(context).colorScheme.surfaceContainer,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: AppRadius.smallAll,
                                 child: Text(
                                   '$quantity',
                                   style: Theme.of(context).textTheme.bodySmall,
@@ -122,7 +126,7 @@ class _OrderCardState extends State<OrderCard> {
                                 height: 30,
                                 padding: EdgeInsets.zero,
                                 buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: AppRadius.smallAll,
                                 child: Text(
                                   '-',
                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -146,7 +150,7 @@ class _OrderCardState extends State<OrderCard> {
                                   height: 30,
                                   padding: EdgeInsets.zero,
                                   buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: AppRadius.smallAll,
                                   child: Text(
                                     '+',
                                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -181,7 +185,7 @@ class _OrderCardState extends State<OrderCard> {
                     width: 70,
                     height: 70,
                     image: widget.imageUrl,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: AppRadius.cardAll,
                     border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.surfaceContainerHighest),
                     backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                     errorWidget: Icon(
@@ -196,7 +200,7 @@ class _OrderCardState extends State<OrderCard> {
                       text: 'Remove',
                       width: 70,
                       fontSize: 10,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: AppRadius.smallAll,
                       padding: const EdgeInsets.all(AppSizes.padding / 4),
                       buttonColor: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.32),
                       textColor: Theme.of(context).colorScheme.error,

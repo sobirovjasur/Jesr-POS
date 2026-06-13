@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../../core/utilities/currency_formatter.dart';
 import '../../../../core/utilities/date_time_formatter.dart';
@@ -20,14 +21,14 @@ class TransactionCard extends StatelessWidget {
           onTap: () async {
             context.push('/transactions/transaction-detail/${transaction.id}');
           },
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: AppRadius.cardAll,
           child: Ink(
             padding: const EdgeInsets.all(AppSizes.padding),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppRadius.cardAll,
               border: Border.all(
-                width: 0.5,
+                width: 1,
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
             ),

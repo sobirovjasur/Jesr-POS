@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../providers/home/home_notifier.dart';
 import '../../../widgets/app_button.dart';
@@ -34,8 +35,8 @@ class CartPanelHeader extends ConsumerWidget {
           ),
         ),
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(AppSizes.radius * 2),
-          topRight: Radius.circular(AppSizes.radius * 2),
+          topLeft: Radius.circular(AppRadius.sheetLarge),
+          topRight: Radius.circular(AppRadius.sheetLarge),
         ),
       ),
       child: Column(
@@ -47,7 +48,7 @@ class CartPanelHeader extends ConsumerWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.54),
-                borderRadius: BorderRadius.circular(100),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
               ),
             ),
           ),
@@ -63,7 +64,7 @@ class CartPanelHeader extends ConsumerWidget {
               ),
               AppButton(
                 height: 26,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: AppRadius.smallAll,
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
                 buttonColor: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.32),
                 enabled: homeState.orderedProducts.isNotEmpty,

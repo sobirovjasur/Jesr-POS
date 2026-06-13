@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../providers/auth/auth_notifier.dart';
 import '../../providers/main/main_notifier.dart';
@@ -48,7 +49,7 @@ class _UserInfo extends ConsumerWidget {
             image: user?.imageUrl ?? '',
             width: 120,
             height: 120,
-            borderRadius: BorderRadius.circular(100),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             backgroundColor: Theme.of(context).colorScheme.surface,
           ),
           const SizedBox(height: AppSizes.padding),

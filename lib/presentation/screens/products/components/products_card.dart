@@ -1,6 +1,7 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../../core/utilities/currency_formatter.dart';
 import '../../../../domain/entities/product_entity.dart';
@@ -25,14 +26,14 @@ class ProductsCard extends StatelessWidget {
         splashColor: Colors.black.withValues(alpha: 0.06),
         splashFactory: InkRipple.splashFactory,
         highlightColor: Colors.black12,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: AppRadius.cardAll,
         child: Ink(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: AppRadius.cardAll,
             border: Border.all(
-              width: 0.5,
+              width: 1,
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
           ),
@@ -47,7 +48,7 @@ class ProductsCard extends StatelessWidget {
                       aspectRatio: 1,
                       child: AppImage(
                         image: product.imageUrl,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: AppRadius.cardAll,
                         border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.surfaceContainerHighest),
                         backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
                         errorWidget: Icon(
@@ -78,14 +79,20 @@ class ProductsCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       'Stock ${product.stock}  |  Sold ${product.sold}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 8),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: 9,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
                   CurrencyFormatter.format(product.price),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ],
             ),
@@ -108,7 +115,7 @@ class _OutOfStock extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Colors.white70,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: AppRadius.smallAll,
         ),
         child: Container(
           padding: const EdgeInsets.symmetric(
@@ -117,7 +124,7 @@ class _OutOfStock extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: AppRadius.smallAll,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

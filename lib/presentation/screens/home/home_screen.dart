@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import '../../../core/themes/app_colors.dart';
+import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../providers/home/home_notifier.dart';
@@ -85,8 +87,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(AppSizes.radius * 2),
-          topRight: Radius.circular(AppSizes.radius * 2),
+          topLeft: Radius.circular(AppRadius.sheetLarge),
+          topRight: Radius.circular(AppRadius.sheetLarge),
         ),
         body: _Body(
           scrollController: scrollController,
@@ -218,7 +220,7 @@ class _Title extends ConsumerWidget {
       children: [
         AppImage(
           image: user?.imageUrl ?? '',
-          borderRadius: BorderRadius.circular(100),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           width: 30,
           height: 30,
           backgroundColor: Theme.of(context).colorScheme.surface,
@@ -270,7 +272,7 @@ class _SyncButton extends ConsumerWidget {
       padding: const EdgeInsets.only(right: AppSizes.padding / 4),
       child: AppButton(
         height: 26,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: AppRadius.smallAll,
         padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
         buttonColor: isHasQueuedActions && !isSyncronizing
             ? Theme.of(context).colorScheme.surfaceContainer
@@ -284,9 +286,7 @@ class _SyncButton extends ConsumerWidget {
                   ? Icons.cloud_done_sharp
                   : Icons.sync_problem_sharp,
               size: 12,
-              color: isHasQueuedActions && !isSyncronizing
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.outline,
+              color: isHasQueuedActions && !isSyncronizing ? AppColors.success : Theme.of(context).colorScheme.outline,
             ),
             const SizedBox(width: AppSizes.padding / 4),
             Text(
@@ -299,7 +299,7 @@ class _SyncButton extends ConsumerWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: isHasQueuedActions && !isSyncronizing
-                    ? Theme.of(context).colorScheme.primary
+                    ? AppColors.success
                     : Theme.of(context).colorScheme.outline,
               ),
             ),
@@ -324,7 +324,7 @@ class _NetworkInfo extends ConsumerWidget {
       padding: const EdgeInsets.only(right: AppSizes.padding),
       child: AppButton(
         height: 26,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: AppRadius.smallAll,
         padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
         buttonColor: isHasInternet
             ? Theme.of(context).colorScheme.surfaceContainer

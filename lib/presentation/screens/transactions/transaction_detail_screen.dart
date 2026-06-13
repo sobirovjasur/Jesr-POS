@@ -88,7 +88,7 @@ class _StatusSection extends StatelessWidget {
       children: [
         const Icon(
           Icons.check_circle_outline_rounded,
-          color: AppColors.green,
+          color: AppColors.success,
           size: 60,
         ),
         const SizedBox(height: AppSizes.padding / 2),
