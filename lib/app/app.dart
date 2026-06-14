@@ -18,7 +18,7 @@ class App extends ConsumerWidget {
     final locale = ref.watch(localeNotifierProvider);
 
     return MaterialApp.router(
-      title: 'Flutter POS',
+      title: 'Jesr',
       theme: theme,
       debugShowCheckedModeBanner: kDebugMode,
       routerConfig: router,

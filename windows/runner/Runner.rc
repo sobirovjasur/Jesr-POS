@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "elriztechnology.com" "\0"
-            VALUE "FileDescription", "flutter_pos" "\0"
+            VALUE "CompanyName", "Jesr POS" "\0"
+            VALUE "FileDescription", "Jesr" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutter_pos" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 elriztechnology.com. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutter_pos.exe" "\0"
-            VALUE "ProductName", "flutter_pos" "\0"
+            VALUE "InternalName", "Jesr" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Jesr POS. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Jesr.exe" "\0"
+            VALUE "ProductName", "Jesr" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

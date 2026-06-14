@@ -187,19 +187,12 @@ class PrinterService {
       final ticket = await Ticket.create(paperSize);
 
       ticket.text(
-        'FLUTTER POS',
+        'JESR POS',
         align: PrintAlign.center,
         style: const PrintTextStyle(
           bold: true,
           height: TextSize.size2,
           width: TextSize.size2,
-        ),
-      );
-      ticket.text(
-        'https://github.com/elrizwiraswara/flutter_pos',
-        align: PrintAlign.center,
-        style: PrintTextStyle(
-          fontType: FontType.fontB,
         ),
       );
 
@@ -340,7 +333,7 @@ class PrinterService {
       ticket.emptyLines(3);
 
       ticket.text(
-        'FLUTTER POS PRINT TEST OK',
+        'JESR POS PRINT TEST OK',
         align: PrintAlign.center,
         style: const PrintTextStyle(bold: true),
       );
