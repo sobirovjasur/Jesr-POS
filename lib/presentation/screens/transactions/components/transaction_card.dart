@@ -74,7 +74,7 @@ class TransactionCard extends ConsumerWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            DateTimeFormatter.normalWithClock(transaction.createdAt ?? ''),
+                            DateTimeFormatter.dotDateWithClock(transaction.createdAt ?? ''),
                             style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                           ),
                         ],

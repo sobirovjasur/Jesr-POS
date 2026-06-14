@@ -22,7 +22,7 @@ class TransactionDetailNotifier extends AutoDisposeNotifier<TransactionEntity?> 
       state = res.data;
       return res.data;
     } else {
-      throw res.error ?? 'Failed to load data';
+      throw Exception(res.error?.toString() ?? 'Failed to load data');
     }
   }
 }

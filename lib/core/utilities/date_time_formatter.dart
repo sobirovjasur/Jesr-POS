@@ -163,6 +163,17 @@ class DateTimeFormatter {
     return DateFormat('HHmm').format(parsedDate);
   }
 
+  /// Figma transaction format: `05.01.2025 | 10:32`.
+  static String dotDateWithClock(String iso8601String) {
+    var parsedDate = DateTime.tryParse(iso8601String);
+
+    if (parsedDate == null) {
+      return '(Invalid date format)';
+    }
+
+    return DateFormat('dd.MM.yyyy | HH:mm').format(parsedDate);
+  }
+
   static String stripDateWithClock(String iso8601String) {
     var parsedDate = DateTime.tryParse(iso8601String);
 

@@ -1,77 +1,140 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
-import '../../../app/di/app_providers.dart';
-import '../../../core/extensions/string_casing_extension.dart';
 import '../../../core/themes/app_colors.dart';
+import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../core/utilities/currency_formatter.dart';
 import '../../../core/utilities/date_time_formatter.dart';
-import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
 import '../../providers/transactions/transaction_detail_notifier.dart';
+import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
-import '../../widgets/app_snack_bar.dart';
+import 'components/transaction_card.dart';
 
-class TransactionDetailScreen extends ConsumerWidget {
+/// Transaction detail (Figma 17/18 — "Чеки").
+///
+/// Two visual states driven by [TransactionEntity.status]:
+///  * `sold`     → success (green check, "Оплата прошла успешно")
+///  * `returned` → error   (red warning, "Оплата не выполнена")
+/// `postponed` transactions never reach this screen (tapping one resumes it
+/// back into the cart), so they fall through to the success styling defensively.
+class TransactionDetailScreen extends ConsumerStatefulWidget {
   final int id;
 
   const TransactionDetailScreen({super.key, required this.id});
 
-  void _reprint(WidgetRef ref) async {
-    final transaction = ref.read(transactionDetailNotifierProvider);
-    if (transaction == null) return;
+  @override
+  ConsumerState<TransactionDetailScreen> createState() => _TransactionDetailScreenState();
+}
 
-    final result = await ref.read(printerServiceProvider).printTransaction(transaction);
+class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScreen> {
+  late final Future<TransactionEntity?> _future;
 
-    if (result.isFailure) {
-      AppSnackBar.showError(result.error.toString());
+  @override
+  void initState() {
+    super.initState();
+    _future = ref.read(transactionDetailNotifierProvider.notifier).getTransactionDetail(widget.id);
+  }
+
+  void _onBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/transactions');
     }
   }
 
+  Future<void> _onShare(BuildContext buttonContext, TransactionEntity transaction) async {
+    // sharePositionOrigin anchors the share popover on iPad/macOS (ignored on
+    // phones). Resolve it from the button's own RenderBox.
+    final box = buttonContext.findRenderObject() as RenderBox?;
+    await SharePlus.instance.share(
+      ShareParams(
+        text: _buildReceipt(transaction),
+        sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+      ),
+    );
+  }
+
+  String _buildReceipt(TransactionEntity t) {
+    final lines = <String>[
+      'Чек № ${t.id ?? '-'}',
+      'Статус: ${transactionStatusInfo(t.status).label}',
+      'Дата: ${DateTimeFormatter.dotDateWithClock(t.createdAt ?? '')}',
+      'Кассир: ${t.createdBy?.name ?? '-'}',
+      'Способ оплаты: ${_paymentLabel(t.paymentMethod)}',
+      if (t.description?.isNotEmpty == true) 'Описание: ${t.description}',
+      '',
+    ];
+
+    for (final p in t.orderedProducts ?? const []) {
+      lines.add('${p.name} ×${p.quantity} — ${CurrencyFormatter.format(p.price * p.quantity)}');
+    }
+
+    lines.addAll([
+      '',
+      'Итого: ${CurrencyFormatter.format(t.totalAmount)}',
+      'Получено: ${t.receivedAmount > 0 ? CurrencyFormatter.format(t.receivedAmount) : '-'}',
+      'Сдача: ${t.returnAmount > 0 ? CurrencyFormatter.format(t.returnAmount) : '-'}',
+    ]);
+
+    return lines.join('\n');
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.print_outlined),
-            tooltip: 'Reprint',
-            onPressed: () => _reprint(ref),
-          ),
-        ],
+        centerTitle: true,
+        title: Text('Чеки', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: _onBack,
+        ),
       ),
-      body: FutureBuilder(
-        future: ref.read(transactionDetailNotifierProvider.notifier).getTransactionDetail(id),
+      body: FutureBuilder<TransactionEntity?>(
+        future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();
           }
 
-          if (snapshot.hasError) {
-            throw snapshot.error.toString();
-          }
-
-          if (snapshot.data == null) {
-            return const AppEmptyState(title: 'Not Found');
+          if (snapshot.hasError || snapshot.data == null) {
+            return const AppEmptyState(title: 'Чек не найден');
           }
 
           final transaction = snapshot.data!;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSizes.padding),
-            child: Column(
-              children: [
-                const _StatusSection(),
-                const SizedBox(height: AppSizes.padding * 2),
-                _TransactionDetail(transaction: transaction),
-                const SizedBox(height: AppSizes.padding),
-                _PaymentDetail(transaction: transaction),
-                const SizedBox(height: AppSizes.padding),
-              ],
-            ),
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSizes.padding),
+                  child: _DetailCard(transaction: transaction),
+                ),
+              ),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSizes.padding),
+                  child: Builder(
+                    builder: (btnContext) => AppButton(
+                      text: 'Поделиться',
+                      width: double.infinity,
+                      height: 52,
+                      fontSize: 18,
+                      onTap: () => _onShare(btnContext, transaction),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -79,261 +142,119 @@ class TransactionDetailScreen extends ConsumerWidget {
   }
 }
 
-class _StatusSection extends StatelessWidget {
-  const _StatusSection();
+String _paymentLabel(String method) => method == 'cash' ? 'Наличные' : method;
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Icon(
-          Icons.check_circle_outline_rounded,
-          color: AppColors.success,
-          size: 60,
-        ),
-        const SizedBox(height: AppSizes.padding / 2),
-        Text(
-          'Transaction Created',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
+/// Icon + title for the success / error header.
+({Widget icon, String title}) _statusHeader(String status) {
+  if (status == 'returned') {
+    return (
+      icon: const Icon(Icons.warning_rounded, color: AppColors.error, size: 64),
+      title: 'Оплата не выполнена',
     );
   }
+  return (
+    icon: Container(
+      width: 64,
+      height: 64,
+      decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
+      child: const Icon(Icons.check_rounded, color: AppColors.onPrimary, size: 38),
+    ),
+    title: 'Оплата прошла успешно',
+  );
 }
 
-class _TransactionDetail extends StatelessWidget {
+class _DetailCard extends StatelessWidget {
   final TransactionEntity transaction;
 
-  const _TransactionDetail({required this.transaction});
+  const _DetailCard({required this.transaction});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final header = _statusHeader(transaction.status);
+
+    final t = transaction;
+
+    final rows = <({String label, String value, bool bold})>[
+      (label: 'Номер чека', value: '${t.id ?? '-'}', bold: false),
+      (label: 'Способ оплаты', value: _paymentLabel(t.paymentMethod), bold: false),
+      (label: 'Кассир', value: t.createdBy?.name ?? '-', bold: false),
+      (label: 'Дата и время', value: DateTimeFormatter.dotDateWithClock(t.createdAt ?? ''), bold: false),
+      (label: 'Описание', value: t.description?.isNotEmpty == true ? t.description! : '-', bold: false),
+      (label: 'Количество товаров', value: '${t.totalOrderedProduct}', bold: false),
+      (label: 'Итоговая сумма', value: CurrencyFormatter.format(t.totalAmount), bold: true),
+      (label: 'Сдача', value: t.returnAmount > 0 ? CurrencyFormatter.format(t.returnAmount) : '-', bold: false),
+      (
+        label: 'Полученная сумма',
+        value: t.receivedAmount > 0 ? CurrencyFormatter.format(t.receivedAmount) : '-',
+        bold: true,
+      ),
+    ];
+
     return Container(
-      padding: const EdgeInsets.all(AppSizes.padding),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppSizes.radius),
+        color: colorScheme.surface,
+        borderRadius: AppRadius.cardAll,
+        border: Border.all(width: 1, color: colorScheme.surfaceContainerHighest),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Transaction ID',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding * 1.5, AppSizes.padding, AppSizes.padding * 1.5),
+            child: Column(
+              children: [
+                header.icon,
+                const SizedBox(height: AppSizes.padding),
+                Text(
+                  header.title,
+                  textAlign: TextAlign.center,
+                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-              ),
-              Text(
-                '${transaction.id ?? '-'}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Payment Method',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Text(
-                transaction.paymentMethod.toTitleCase(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Created By',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Text(
-                transaction.createdBy?.name ?? '-',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Created At',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Text(
-                DateTimeFormatter.normalWithClock(transaction.createdAt ?? ''),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Customer Name',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Text(
-                transaction.customerName ?? '-',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Description',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Text(
-                transaction.description ?? '-',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PaymentDetail extends StatelessWidget {
-  final TransactionEntity transaction;
-
-  const _PaymentDetail({required this.transaction});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.padding),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppSizes.radius),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Ordered Products',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '${transaction.orderedProducts?.length ?? '0'}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const Divider(height: AppSizes.padding * 2),
-          ...List.generate(transaction.orderedProducts?.length ?? 0, (i) {
-            return Padding(
-              padding: EdgeInsets.only(top: i == 0 ? 0 : AppSizes.padding / 2),
-              child: _ProductItem(order: transaction.orderedProducts![i]),
-            );
-          }),
-          const Divider(height: AppSizes.padding * 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                CurrencyFormatter.format(transaction.totalAmount),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Payment Received',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Text(
-                CurrencyFormatter.format(transaction.receivedAmount),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.padding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Change',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              Text(
-                CurrencyFormatter.format(transaction.receivedAmount - transaction.totalAmount),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProductItem extends StatelessWidget {
-  final OrderedProductEntity order;
-
-  const _ProductItem({required this.order});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          order.name,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: AppSizes.padding / 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '${CurrencyFormatter.format(order.price)} x ${order.quantity}',
-              style: Theme.of(context).textTheme.bodyMedium,
+              ],
             ),
-            Text(
-              CurrencyFormatter.format((order.price) * order.quantity),
-              style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          for (final r in rows) ...[
+            Divider(height: 1, color: colorScheme.surfaceContainerHighest),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding, vertical: AppSizes.padding / 1.5),
+              child: _DetailRow(label: r.label, value: r.value, bold: r.bold),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool bold;
+
+  const _DetailRow({required this.label, required this.value, this.bold = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+          ),
+        ),
+        const SizedBox(width: AppSizes.padding),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: textTheme.bodyMedium?.copyWith(fontWeight: bold ? FontWeight.bold : FontWeight.w500),
+          ),
         ),
       ],
     );
