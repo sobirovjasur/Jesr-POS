@@ -16,6 +16,11 @@ avtomatik sinxronlanadi. Internet bo'lmaganda ham (yaratish, tahrirlash,
 o'chirish) amallari navbatga olinadi va aloqa tiklangach bajariladi.
 
 
+REPOZITORIYA (GITHUB)
+---------------------
+https://github.com/sobirovjasur/Jesr-POS
+
+
 DASTURLASH TILI
 ---------------
 - Dart (3.x)
