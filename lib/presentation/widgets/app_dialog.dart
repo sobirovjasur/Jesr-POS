@@ -259,9 +259,9 @@ class _DialogTitle extends StatelessWidget {
         ? Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSizes.padding,
-              AppSizes.padding * 1.5,
+              AppSizes.padding * 1.25,
               AppSizes.padding,
-              AppSizes.padding / 2,
+              AppSizes.padding / 3,
             ),
             child: Text(
               title!,
@@ -288,15 +288,24 @@ class _DialogBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // For a plain text body (e.g. confirm dialogs) keep a tight gap to the
+    // title; for custom children use full padding.
+    if (text != null) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(AppSizes.padding, 0, AppSizes.padding, AppSizes.padding),
+        child: Text(
+          text!,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: padding ?? const EdgeInsets.all(AppSizes.padding),
-      child: text != null
-          ? Text(
-              text!,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
-            )
-          : child ?? const SizedBox.shrink(),
+      child: child ?? const SizedBox.shrink(),
     );
   }
 }

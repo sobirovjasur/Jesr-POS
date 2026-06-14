@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/app_providers.dart';
+import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../providers/home/home_notifier.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
-import '../../../widgets/app_drop_down.dart';
 import '../../../widgets/app_text_field.dart';
 
 /// Payment dialog shown from the cart's "Оплата" button. Collects the received
@@ -62,7 +62,6 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
 
   @override
   Widget build(BuildContext context) {
-    final homeState = ref.watch(homeNotifierProvider);
     final homeNotifier = ref.read(homeNotifierProvider.notifier);
 
     return Column(
@@ -77,14 +76,30 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
           onChanged: (v) => homeNotifier.onChangedReceivedAmount(int.tryParse(v) ?? 0),
         ),
         const SizedBox(height: AppSizes.padding),
-        AppDropDown(
-          labelText: 'Способ оплаты',
-          selectedValue: homeState.selectedPaymentMethod,
-          dropdownItems: const [
-            DropdownMenuItem(value: 'cash', child: Text('Наличные')),
-            DropdownMenuItem(value: 'bank', child: Text('Карта')),
-          ],
-          onChanged: homeNotifier.onChangedPaymentMethod,
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Способ оплаты',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSizes.padding / 2),
+        Container(
+          width: double.infinity,
+          height: 52,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
+            borderRadius: AppRadius.cardAll,
+          ),
+          child: Text(
+            'Наличные',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+          ),
         ),
         const SizedBox(height: AppSizes.padding),
         AppTextField(
