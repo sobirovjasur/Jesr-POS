@@ -266,7 +266,8 @@ class _DialogTitle extends StatelessWidget {
             child: Text(
               title!,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -344,7 +345,7 @@ class _DialogButtons extends StatelessWidget {
     return leftButtonText == null && rightButtonText == null
         ? const SizedBox.shrink()
         : Padding(
-            padding: const EdgeInsets.all(AppSizes.padding),
+            padding: const EdgeInsets.fromLTRB(AppSizes.padding, 0, AppSizes.padding, AppSizes.padding),
             child: Row(
               children: <Widget>[
                 leftButtonText != null
