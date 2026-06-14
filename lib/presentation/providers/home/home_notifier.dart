@@ -87,6 +87,11 @@ class HomeNotifier extends Notifier<HomeState> {
       Result<int>? primary;
 
       if (selected.isNotEmpty) {
+        // Defense in depth: the checkout UI disables payment until the received
+        // amount covers the total, but guard here too so we never persist a sale
+        // with a negative change.
+        if (state.receivedAmount < getSelectedTotal()) throw 'Недостаточно средств';
+
         primary = await _createTransaction(selected, status: 'sold', receivedAmount: state.receivedAmount);
         if (primary.isFailure) return primary;
       }
@@ -169,8 +174,10 @@ class HomeNotifier extends Notifier<HomeState> {
   }
 
   void onRemoveOrderedProduct(OrderedProductEntity val) {
+    final ids = {...state.unselectedProductIds}..remove(val.productId);
     state = state.copyWith(
       orderedProducts: state.orderedProducts.where((e) => e != val).toList(),
+      unselectedProductIds: ids,
     );
   }
 
@@ -178,8 +185,10 @@ class HomeNotifier extends Notifier<HomeState> {
     state = const HomeState();
   }
 
-  void onChangedOrderedProductQuantity(int index, int value) {
+  void onChangedOrderedProductQuantity(int productId, int value) {
     final orderedProducts = [...state.orderedProducts];
+    final index = orderedProducts.indexWhere((e) => e.productId == productId);
+    if (index == -1) return;
     orderedProducts[index] = orderedProducts[index].copyWith(quantity: value);
     state = state.copyWith(orderedProducts: orderedProducts);
   }

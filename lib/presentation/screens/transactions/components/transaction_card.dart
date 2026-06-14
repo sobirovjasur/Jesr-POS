@@ -40,10 +40,10 @@ class TransactionCard extends ConsumerWidget {
         color: colorScheme.surface,
         borderRadius: AppRadius.cardAll,
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             if (transaction.status == 'postponed') {
-              ref.read(homeNotifierProvider.notifier).resumePostponed(transaction);
-              context.push('/cart');
+              await ref.read(homeNotifierProvider.notifier).resumePostponed(transaction);
+              if (context.mounted) context.push('/cart');
             } else {
               context.push('/transactions/transaction-detail/${transaction.id}');
             }

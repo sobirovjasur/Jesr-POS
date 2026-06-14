@@ -38,6 +38,15 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
   final _descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Clear any received amount left over from a previously cancelled checkout.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(homeNotifierProvider.notifier).onChangedReceivedAmount(0);
+    });
+  }
+
+  @override
   void dispose() {
     _amountController.dispose();
     _customerController.dispose();

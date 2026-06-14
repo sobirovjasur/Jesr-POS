@@ -49,10 +49,9 @@ class CartScreen extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final entries = items.asMap().entries.toList();
-    final selected = entries.where((e) => !unselectedIds.contains(e.value.productId)).toList();
-    final unselected = entries.where((e) => unselectedIds.contains(e.value.productId)).toList();
-    final selectedTotal = selected.fold<int>(0, (sum, e) => sum + e.value.price * e.value.quantity);
+    final selected = items.where((e) => !unselectedIds.contains(e.productId)).toList();
+    final unselected = items.where((e) => unselectedIds.contains(e.productId)).toList();
+    final selectedTotal = selected.fold<int>(0, (sum, e) => sum + e.price * e.quantity);
 
     return Scaffold(
       appBar: AppBar(
@@ -101,7 +100,7 @@ class CartScreen extends ConsumerWidget {
                               ),
                               for (final e in selected) ...[
                                 Divider(height: 1, color: colorScheme.surfaceContainerHighest),
-                                _CartItemTile(item: e.value, index: e.key, selected: true),
+                                _CartItemTile(item: e, selected: true),
                               ],
                               if (unselected.isNotEmpty) ...[
                                 Padding(
@@ -121,7 +120,7 @@ class CartScreen extends ConsumerWidget {
                                 ),
                                 for (final e in unselected) ...[
                                   Divider(height: 1, color: colorScheme.surfaceContainerHighest),
-                                  _CartItemTile(item: e.value, index: e.key, selected: false),
+                                  _CartItemTile(item: e, selected: false),
                                 ],
                               ],
                             ],
@@ -204,10 +203,9 @@ class _SummaryRow extends StatelessWidget {
 
 class _CartItemTile extends ConsumerWidget {
   final OrderedProductEntity item;
-  final int index;
   final bool selected;
 
-  const _CartItemTile({required this.item, required this.index, required this.selected});
+  const _CartItemTile({required this.item, required this.selected});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -254,14 +252,14 @@ class _CartItemTile extends ConsumerWidget {
                   quantity: item.quantity,
                   onDecrement: () {
                     if (item.quantity > 1) {
-                      notifier.onChangedOrderedProductQuantity(index, item.quantity - 1);
+                      notifier.onChangedOrderedProductQuantity(item.productId, item.quantity - 1);
                     } else {
                       notifier.onRemoveOrderedProduct(item);
                     }
                   },
                   onIncrement: () {
                     if (item.quantity < item.stock) {
-                      notifier.onChangedOrderedProductQuantity(index, item.quantity + 1);
+                      notifier.onChangedOrderedProductQuantity(item.productId, item.quantity + 1);
                     }
                   },
                 ),

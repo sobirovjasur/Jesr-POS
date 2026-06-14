@@ -52,17 +52,21 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
 
             var product = ProductModel.fromJson(rawProduct.first);
 
-            // Update product stock and sold
-            int stock = product.stock - orderedProduct.quantity;
-            int sold = product.sold + orderedProduct.quantity;
-
-            batch.update(
-              DatabaseConfig.productTableName,
-              {'stock': stock, 'sold': sold},
-              where: 'id = ?',
-              whereArgs: [product.id],
-              conflictAlgorithm: ConflictAlgorithm.replace,
-            );
+            // Only a completed sale consumes inventory. 'returned' items were
+            // declined at checkout (never sold) and 'postponed' orders are not
+            // finalized — neither should change stock/sold.
+            if (transaction.status == 'sold') {
+              batch.update(
+                DatabaseConfig.productTableName,
+                {
+                  'stock': product.stock - orderedProduct.quantity,
+                  'sold': product.sold + orderedProduct.quantity,
+                },
+                where: 'id = ?',
+                whereArgs: [product.id],
+                conflictAlgorithm: ConflictAlgorithm.replace,
+              );
+            }
           }
 
           // Commit batch operations
@@ -146,6 +150,18 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
   Future<Result<void>> deleteTransaction(int id) async {
     try {
       await _databaseService.database.transaction((trx) async {
+        // Only 'sold' transactions changed stock/sold, so only those should be
+        // reverted on delete. 'returned'/'postponed' never touched inventory —
+        // reverting them would wrongly inflate stock (e.g. resuming a postponed
+        // order deletes its record and must not add phantom stock back).
+        var txRows = await trx.query(
+          DatabaseConfig.transactionTableName,
+          columns: ['status'],
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        final status = txRows.isNotEmpty ? (txRows.first['status'] as String? ?? 'sold') : 'sold';
+
         // Get ordered products to revert stock
         var orderedProducts = await trx.query(
           DatabaseConfig.orderedProductTableName,
@@ -153,30 +169,32 @@ class TransactionLocalDatasourceImpl extends TransactionDatasource {
           whereArgs: [id],
         );
 
-        // Revert stock for each ordered product
-        for (var orderedProductMap in orderedProducts) {
-          var orderedProduct = OrderedProductModel.fromJson(orderedProductMap);
+        // Revert stock for each ordered product (sold transactions only)
+        if (status == 'sold') {
+          for (var orderedProductMap in orderedProducts) {
+            var orderedProduct = OrderedProductModel.fromJson(orderedProductMap);
 
-          // Get current product data
-          var productResults = await trx.query(
-            DatabaseConfig.productTableName,
-            where: 'id = ?',
-            whereArgs: [orderedProduct.productId],
-          );
-
-          if (productResults.isNotEmpty) {
-            var product = ProductModel.fromJson(productResults.first);
-
-            int revertedStock = product.stock + orderedProduct.quantity;
-            int revertedSold = product.sold - orderedProduct.quantity;
-
-            // Update product stock and sold count
-            await trx.update(
+            // Get current product data
+            var productResults = await trx.query(
               DatabaseConfig.productTableName,
-              {'stock': revertedStock, 'sold': revertedSold},
               where: 'id = ?',
               whereArgs: [orderedProduct.productId],
             );
+
+            if (productResults.isNotEmpty) {
+              var product = ProductModel.fromJson(productResults.first);
+
+              int revertedStock = product.stock + orderedProduct.quantity;
+              int revertedSold = product.sold - orderedProduct.quantity;
+
+              // Update product stock and sold count
+              await trx.update(
+                DatabaseConfig.productTableName,
+                {'stock': revertedStock, 'sold': revertedSold},
+                where: 'id = ?',
+                whereArgs: [orderedProduct.productId],
+              );
+            }
           }
         }
 
