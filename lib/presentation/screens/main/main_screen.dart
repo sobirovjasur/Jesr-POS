@@ -47,27 +47,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.point_of_sale_outlined),
-            label: 'Главная',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize_outlined),
-            label: 'Товары',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined),
-            label: 'Чеки',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_rounded),
-            label: 'Профиль',
-          ),
-        ],
+      bottomNavigationBar: _BottomNav(
         currentIndex: _calculateSelectedIndex(),
-        onTap: (int idx) => _onItemTapped(idx),
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -107,5 +89,66 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 3:
         router.go('/account');
     }
+  }
+}
+
+class _BottomNav extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const _BottomNav({required this.currentIndex, required this.onTap});
+
+  static const List<({IconData icon, String label})> _items = [
+    (icon: Icons.point_of_sale_rounded, label: 'Главная'),
+    (icon: Icons.grid_view_rounded, label: 'Товары'),
+    (icon: Icons.receipt_long_rounded, label: 'Чеки'),
+    (icon: Icons.person_rounded, label: 'Профиль'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        border: Border(top: BorderSide(color: colorScheme.surfaceContainerHighest, width: 0.5)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            children: [
+              for (var i = 0; i < _items.length; i++)
+                Expanded(
+                  child: InkWell(
+                    onTap: () => onTap(i),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _items[i].icon,
+                          size: 26,
+                          color: i == currentIndex ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _items[i].label,
+                          style: textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: i == currentIndex ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
