@@ -50,20 +50,20 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.maps_home_work_outlined),
-            label: 'Home',
+            icon: Icon(Icons.point_of_sale_outlined),
+            label: 'Главная',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize_outlined),
-            label: 'Products',
+            label: 'Товары',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_rounded),
-            label: 'Transactions',
+            icon: Icon(Icons.receipt_long_outlined),
+            label: 'Чеки',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle_outlined),
-            label: 'Account',
+            icon: Icon(Icons.person_outline_rounded),
+            label: 'Профиль',
           ),
         ],
         currentIndex: _calculateSelectedIndex(),

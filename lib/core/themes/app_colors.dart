@@ -39,8 +39,11 @@ class AppColors {
   /// Passive/disabled icons.
   static const Color mutedIcon = Color(0xFFB0BABF);
 
-  /// Success / "Synced" / online state.
+  /// Success / "Synced" / online state / sufficient stock.
   static const Color success = Color(0xFF48C54A);
+
+  /// Warning / limited (low) stock indicator.
+  static const Color warning = Color(0xFFF9AA00);
 
   /// Error (red).
   static const Color error = Color(0xFFE5484D);

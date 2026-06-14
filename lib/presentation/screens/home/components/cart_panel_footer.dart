@@ -5,7 +5,6 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../../app/di/app_providers.dart';
 import '../../../../core/themes/app_sizes.dart';
-import '../../../../core/utilities/currency_formatter.dart';
 import '../../../providers/home/home_notifier.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
@@ -74,14 +73,10 @@ class _PayButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeNotifierProvider);
-    final homeNotifier = ref.read(homeNotifierProvider.notifier);
 
     return AppButton(
-      text: !homeState.isPanelExpanded
-          ? homeState.orderedProducts.isNotEmpty
-                ? "${homeState.orderedProducts.length} Products = ${CurrencyFormatter.format(homeNotifier.getTotalAmount())}"
-                : 'Transaction'
-          : 'Pay',
+      text: !homeState.isPanelExpanded ? 'Перейти в корзину' : 'Pay',
+      fontSize: 16,
       enabled: homeState.orderedProducts.isNotEmpty,
       onTap: () {
         if (homeState.isPanelExpanded) {
