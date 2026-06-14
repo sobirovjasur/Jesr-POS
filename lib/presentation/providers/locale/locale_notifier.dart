@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/locale/app_locale.dart';
+import '../../../core/locale/l10n.dart';
 
 final localeNotifierProvider = NotifierProvider<LocaleNotifier, Locale>(LocaleNotifier.new);
 
@@ -17,6 +18,7 @@ class LocaleNotifier extends Notifier<Locale> {
 
   @override
   Locale build() {
+    L10n.currentLanguageCode = AppLocale.defaultLocale.languageCode;
     _load();
     return AppLocale.defaultLocale;
   }
@@ -24,10 +26,14 @@ class LocaleNotifier extends Notifier<Locale> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final code = prefs.getString(_key);
-    if (code != null && code.isNotEmpty) state = Locale(code);
+    if (code != null && code.isNotEmpty) {
+      L10n.currentLanguageCode = code;
+      state = Locale(code);
+    }
   }
 
   Future<void> setLocale(Locale locale) async {
+    L10n.currentLanguageCode = locale.languageCode;
     state = locale;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, locale.languageCode);

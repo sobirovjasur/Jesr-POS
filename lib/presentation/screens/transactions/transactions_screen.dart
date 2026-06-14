@@ -73,7 +73,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
             ),
             child: _SegmentedTabs(
               current: _tab,
-              labels: const ['Чеки', 'Отложенный'],
+              labels: [context.tr('transactions_tab_completed'), context.tr('transactions_tab_postponed')],
               onChanged: (i) => setState(() => _tab = i),
             ),
           ),
@@ -113,9 +113,9 @@ class _TransactionList extends StatelessWidget {
     }
 
     if (transactions!.isEmpty) {
-      return const CustomScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        slivers: [SliverFillRemaining(hasScrollBody: false, child: AppEmptyState(subtitle: 'Чеков пока нет'))],
+      return CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [SliverFillRemaining(hasScrollBody: false, child: AppEmptyState(subtitle: context.tr('transactions_empty_state')))],
       );
     }
 

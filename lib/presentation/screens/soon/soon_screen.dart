@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../widgets/app_button.dart';
 
@@ -26,19 +27,19 @@ class SoonScreen extends StatelessWidget {
                 Icon(Icons.settings_outlined, size: 64, color: colorScheme.outlineVariant),
                 const SizedBox(height: AppSizes.padding * 1.5),
                 Text(
-                  'Скоро будет доступно',
+                  context.tr('soon_title'),
                   textAlign: TextAlign.center,
                   style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: AppSizes.padding / 2),
                 Text(
-                  'Функция скоро станет доступна. Спасибо за ваше терпение',
+                  context.tr('soon_message'),
                   textAlign: TextAlign.center,
                   style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: AppSizes.padding * 1.5),
                 AppButton(
-                  text: 'Назад',
+                  text: context.tr('common_back'),
                   width: 200,
                   height: 50,
                   fontSize: 16,

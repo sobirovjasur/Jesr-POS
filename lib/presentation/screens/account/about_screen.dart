@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_sizes.dart';
 
 /// About screen (Figma 22 — "О приложении").
@@ -38,7 +39,7 @@ class _AboutScreenState extends State<AboutScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('О приложении', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('about_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
@@ -55,23 +56,17 @@ class _AboutScreenState extends State<AboutScreen> {
             Text('version $version', style: muted),
             const SizedBox(height: AppSizes.padding),
             Text(
-              'POS-приложение (точка продаж), разработанное на Flutter и демонстрирующее принципы чистой '
-              'архитектуры (Clean Architecture) и подход offline-first в проектировании.',
+              context.tr('about_description_1'),
               style: body,
             ),
             const SizedBox(height: AppSizes.padding),
             Text(
-              'Этот проект служит учебным ресурсом и эталонной реализацией с правильной архитектурой и '
-              'автоматической синхронизацией данных между локальным хранилищем (SQLite) и облачной базой '
-              'данных (Firestore).',
+              context.tr('about_description_2'),
               style: body,
             ),
             const SizedBox(height: AppSizes.padding),
             Text(
-              'Приложение работает по принципу local-first: все данные хранятся в SQLite и автоматически '
-              'синхронизируются с Firestore при наличии интернет-соединения. В офлайн-режиме все действия '
-              'пользователя (создание, обновление, удаление) записываются как QueuedActions в локальную базу '
-              'данных и автоматически выполняются по очереди после восстановления интернет-соединения.',
+              context.tr('about_description_3'),
               style: body,
             ),
           ],

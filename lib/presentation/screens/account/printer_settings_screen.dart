@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:unified_esc_pos_printer/unified_esc_pos_printer.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -34,7 +35,7 @@ class _PrinterSettingsScreenState extends ConsumerState<PrinterSettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Настройки принтера', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('printer_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
@@ -82,7 +83,7 @@ class _PaperSizeSelector extends ConsumerWidget {
     final isBusy = _isBusy(ref);
 
     return AppDropDown<PaperSize>(
-      labelText: 'Размер бумаги',
+      labelText: context.tr('printer_paper_size_label'),
       selectedValue: paperSize,
       enabled: !isBusy,
       dropdownItems: PaperSize.values
@@ -96,9 +97,9 @@ class _PaperSizeSelector extends ConsumerWidget {
   }
 
   String _label(PaperSize size) => switch (size) {
-    PaperSize.mm58 => '58 мм',
-    PaperSize.mm72 => '72 мм',
-    PaperSize.mm80 => '80 мм',
+    PaperSize.mm58 => L10n.trc('printer_paper_size_58mm'),
+    PaperSize.mm72 => L10n.trc('printer_paper_size_72mm'),
+    PaperSize.mm80 => L10n.trc('printer_paper_size_80mm'),
   };
 }
 
@@ -111,8 +112,8 @@ class _ConnectionTypeDropDown extends ConsumerWidget {
     final isBusy = _isBusy(ref);
 
     return AppDropDown<PrinterConnectionType>.multi(
-      labelText: 'Типы подключения',
-      hintText: 'Выберите типы',
+      labelText: context.tr('printer_connection_types_label'),
+      hintText: context.tr('printer_connection_types_hint'),
       enabled: !isBusy,
       selectedValues: selectedTypes,
       dropdownItems: PrinterConnectionType.values.map((type) {
@@ -150,7 +151,7 @@ class _ConnectionTypeDropDown extends ConsumerWidget {
   };
 
   String _selectedLabel(Set<PrinterConnectionType> selectedTypes) {
-    if (selectedTypes.length == PrinterConnectionType.values.length) return 'Все типы';
+    if (selectedTypes.length == PrinterConnectionType.values.length) return L10n.trc('printer_all_types');
     return selectedTypes.map(_label).join(', ');
   }
 }
@@ -170,7 +171,7 @@ class _DevicesHeader extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Text('Доступные устройства', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text(context.tr('printer_available_devices_header'), style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
             if (isScanning) ...[
               const SizedBox(width: AppSizes.padding / 1.5),
               const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
@@ -178,7 +179,7 @@ class _DevicesHeader extends ConsumerWidget {
           ],
         ),
         AppButton(
-          text: 'Сканировать',
+          text: context.tr('printer_scan_button'),
           height: 38,
           fontSize: 14,
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding),
@@ -208,7 +209,7 @@ class _PrinterList extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSizes.padding * 2),
         child: Center(
           child: Text(
-            isScanning ? 'Поиск принтеров...' : 'Принтеры не найдены',
+            isScanning ? context.tr('printer_searching_empty_state') : context.tr('printer_not_found_empty_state'),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.outline,
@@ -332,7 +333,7 @@ class _DeviceTile extends StatelessWidget {
             )
           else if (isSelected)
             AppButton(
-              text: 'Отключить',
+              text: context.tr('printer_disconnect_button'),
               height: 38,
               fontSize: 13,
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 1.2),
@@ -343,7 +344,7 @@ class _DeviceTile extends StatelessWidget {
             )
           else
             AppButton(
-              text: 'Подключить',
+              text: context.tr('printer_connect_button'),
               height: 38,
               fontSize: 13,
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 1.2),

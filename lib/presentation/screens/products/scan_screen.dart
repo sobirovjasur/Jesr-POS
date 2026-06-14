@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/product_entity.dart';
@@ -24,7 +25,7 @@ class ScanAddScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Товары', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('products_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
@@ -40,7 +41,7 @@ class ScanAddScreen extends StatelessWidget {
                   Icon(Icons.qr_code_scanner_rounded, size: 64, color: colorScheme.outlineVariant),
                   const SizedBox(height: AppSizes.padding),
                   Text(
-                    'Отсканируйте штрих-код или товар',
+                    context.tr('scan_instruction'),
                     style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                 ],
@@ -55,7 +56,7 @@ class ScanAddScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: AppButton(
-                      text: 'Сканер',
+                      text: context.tr('scan_button'),
                       height: 52,
                       fontSize: 16,
                       onTap: () => context.push('/products/scan-camera'),
@@ -64,7 +65,7 @@ class ScanAddScreen extends StatelessWidget {
                   const SizedBox(width: AppSizes.padding / 2),
                   Expanded(
                     child: AppButton(
-                      text: 'Вручную',
+                      text: context.tr('scan_manual_button'),
                       height: 52,
                       fontSize: 16,
                       buttonColor: colorScheme.surfaceContainerLow,
@@ -136,7 +137,7 @@ class _ScanCameraScreenState extends ConsumerState<ScanCameraScreen> {
         centerTitle: true,
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Text('Сканировать', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(context.tr('scan_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Colors.white),
           onPressed: () => context.pop(),
@@ -164,7 +165,7 @@ class _ScanCameraScreenState extends ConsumerState<ScanCameraScreen> {
           ),
           Positioned(
             bottom: 80,
-            child: Text('Просканируйте штрих-код', style: textTheme.bodyMedium?.copyWith(color: Colors.white)),
+            child: Text(context.tr('scan_camera_instruction'), style: textTheme.bodyMedium?.copyWith(color: Colors.white)),
           ),
         ],
       ),
@@ -188,13 +189,13 @@ class _CameraError extends StatelessWidget {
             const Icon(Icons.no_photography_outlined, color: Colors.white70, size: 56),
             const SizedBox(height: AppSizes.padding),
             Text(
-              'Камера недоступна',
+              context.tr('scan_camera_unavailable'),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSizes.padding / 2),
             Text(
-              message ?? 'Разрешите доступ к камере в настройках, затем попробуйте снова.',
+              message ?? context.tr('scan_camera_permission_message'),
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),

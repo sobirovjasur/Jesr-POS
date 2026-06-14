@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di/app_providers.dart';
 import '../../../core/common/result.dart';
+import '../../../core/locale/l10n.dart';
 import '../../../domain/entities/ordered_product_entity.dart';
 import '../../../domain/entities/product_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
@@ -82,7 +83,7 @@ class HomeNotifier extends Notifier<HomeState> {
 
       final selected = selectedProducts;
       final unselected = unselectedProducts;
-      if (selected.isEmpty && unselected.isEmpty) throw 'Корзина пуста';
+      if (selected.isEmpty && unselected.isEmpty) throw L10n.trc('home_cart_empty');
 
       Result<int>? primary;
 
@@ -90,7 +91,7 @@ class HomeNotifier extends Notifier<HomeState> {
         // Defense in depth: the checkout UI disables payment until the received
         // amount covers the total, but guard here too so we never persist a sale
         // with a negative change.
-        if (state.receivedAmount < getSelectedTotal()) throw 'Недостаточно средств';
+        if (state.receivedAmount < getSelectedTotal()) throw L10n.trc('home_insufficient_funds');
 
         primary = await _createTransaction(selected, status: 'sold', receivedAmount: state.receivedAmount);
         if (primary.isFailure) return primary;
@@ -115,7 +116,7 @@ class HomeNotifier extends Notifier<HomeState> {
   Future<Result<int>> postpone() async {
     try {
       if (!ref.read(authNotifierProvider).isAuthenticated) throw 'Unauthenticated!';
-      if (state.orderedProducts.isEmpty) throw 'Корзина пуста';
+      if (state.orderedProducts.isEmpty) throw L10n.trc('home_cart_empty');
 
       final res = await _createTransaction(state.orderedProducts, status: 'postponed', receivedAmount: 0);
       if (res.isSuccess) state = const HomeState();

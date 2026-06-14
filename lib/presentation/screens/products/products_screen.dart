@@ -99,7 +99,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding / 2, AppSizes.padding, AppSizes.padding),
             child: AppButton(
-              text: 'Добавить',
+              text: context.tr('products_add_button'),
               width: double.infinity,
               height: 52,
               fontSize: 18,
@@ -141,7 +141,7 @@ class _SearchBar extends StatelessWidget {
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
-                hintText: 'Поиск товаров',
+                hintText: context.tr('products_search_hint'),
                 hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colorScheme.outlineVariant),
               ),
             ),
@@ -188,7 +188,7 @@ class _SearchResults extends StatelessWidget {
             Icon(Icons.search_off_rounded, size: 64, color: colorScheme.outlineVariant),
             const SizedBox(height: AppSizes.padding),
             Text(
-              'Ничего не найдено',
+              context.tr('empty_search_results'),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ],
@@ -249,7 +249,7 @@ class _SearchResultTile extends StatelessWidget {
                         style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '  ·  Ост: ${product.stock}',
+                        '  ·  ${context.tr('products_stock_short')} ${product.stock}',
                         style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                       ),
                     ],
@@ -293,9 +293,9 @@ class _ProductGrid extends StatelessWidget {
             if (products == null)
               const SliverFillRemaining(hasScrollBody: false, child: AppProgressIndicator())
             else if (products!.isEmpty)
-              const SliverFillRemaining(
+              SliverFillRemaining(
                 hasScrollBody: false,
-                child: AppEmptyState(subtitle: 'Нет товаров, добавьте товар'),
+                child: AppEmptyState(subtitle: context.tr('empty_products_list')),
               )
             else
               SliverPadding(

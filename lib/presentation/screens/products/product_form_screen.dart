@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/services/image/background_removal_service.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
@@ -108,7 +109,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     if (res.isSuccess) {
       if (!mounted) return;
       context.go('/products');
-      AppSnackBar.show('Ваш продукт', message: 'Успешно добавлен в систему!');
+      AppSnackBar.show(L10n.trc('product_your_product'), message: L10n.trc('product_success_added'));
     } else {
       AppDialog.showError(error: res.error?.toString());
     }
@@ -122,7 +123,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     if (res.isSuccess) {
       if (!mounted) return;
       context.pop();
-      AppSnackBar.show('Ваш продукт', message: 'Успешно обновлён!');
+      AppSnackBar.show(L10n.trc('product_your_product'), message: L10n.trc('product_success_updated'));
     } else {
       AppDialog.showError(error: res.error?.toString());
     }
@@ -136,7 +137,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     if (res.isSuccess) {
       if (!mounted) return;
       context.go('/products');
-      AppSnackBar.showWarning('Товар удалён', message: 'Продукт удалён из системы');
+      AppSnackBar.showWarning(L10n.trc('product_deleted'), message: L10n.trc('product_removed_from_system'));
     } else {
       AppDialog.showError(error: res.error?.toString());
     }
@@ -144,10 +145,10 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   void _confirmDelete() {
     AppDialog.show(
-      title: 'Внимание',
-      text: 'Хотите удалить этот товар?',
-      leftButtonText: 'Нет',
-      rightButtonText: 'Да',
+      title: context.tr('common_attention'),
+      text: context.tr('product_confirm_delete'),
+      leftButtonText: context.tr('common_no'),
+      rightButtonText: context.tr('common_yes'),
       rightButtonColor: Theme.of(context).colorScheme.errorContainer,
       rightButtonTextColor: Theme.of(context).colorScheme.error,
       onTapRightButton: (context) {
@@ -170,7 +171,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(_isEdit ? 'Изменить товар' : 'Товары', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(_isEdit ? context.tr('product_edit_button') : context.tr('products_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
@@ -186,29 +187,29 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Фото товара', style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(context.tr('product_photo_label'), style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: AppSizes.padding / 2),
                         _PhotoPicker(onTap: onTapImage),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: nameController,
-                          labelText: 'Название товара',
-                          hintText: 'Название вашего продукта',
+                          labelText: context.tr('product_name_label'),
+                          hintText: context.tr('product_name_hint'),
                           onChanged: notifier.onChangedName,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: priceController,
-                          labelText: 'Цена',
-                          hintText: 'Цена товара',
+                          labelText: context.tr('product_price_label'),
+                          hintText: context.tr('product_price_hint'),
                           type: AppTextFieldType.currency,
                           onChanged: notifier.onChangedPrice,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: stockController,
-                          labelText: 'Кол-во / Шт',
-                          hintText: 'Количество',
+                          labelText: context.tr('product_quantity_label'),
+                          hintText: context.tr('product_quantity_hint'),
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: notifier.onChangedStock,
@@ -216,16 +217,16 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: barcodeController,
-                          labelText: 'Штрих-код',
-                          hintText: 'Отсканируйте или введите',
+                          labelText: context.tr('product_barcode_label'),
+                          hintText: context.tr('product_barcode_hint'),
                           keyboardType: TextInputType.number,
                           onChanged: notifier.onChangedBarcode,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: installmentController,
-                          labelText: 'В рассрочку',
-                          hintText: 'на 6 месяцев',
+                          labelText: context.tr('product_installment_label'),
+                          hintText: context.tr('product_installment_hint'),
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: notifier.onChangedInstallmentMonths,
@@ -233,23 +234,23 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: specsController,
-                          labelText: 'Характеристики',
-                          hintText: 'Напишите',
+                          labelText: context.tr('product_specs_label'),
+                          hintText: context.tr('product_specs_hint'),
                           maxLines: 4,
                           onChanged: notifier.onChangedSpecifications,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: descController,
-                          labelText: 'Описание товара',
-                          hintText: 'Напишите',
+                          labelText: context.tr('product_description_label'),
+                          hintText: context.tr('product_specs_hint'),
                           maxLines: 4,
                           onChanged: notifier.onChangedDesc,
                         ),
                         if (_isEdit) ...[
                           const SizedBox(height: AppSizes.padding),
                           AppButton(
-                            text: 'Удалить товар',
+                            text: context.tr('product_delete_button'),
                             width: double.infinity,
                             height: 50,
                             textColor: Theme.of(context).colorScheme.error,
@@ -267,7 +268,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(AppSizes.padding),
                     child: AppButton(
-                      text: _isEdit ? 'Сохранить' : 'Добавить',
+                      text: _isEdit ? context.tr('common_save') : context.tr('products_add_button'),
                       width: double.infinity,
                       height: 52,
                       fontSize: 18,

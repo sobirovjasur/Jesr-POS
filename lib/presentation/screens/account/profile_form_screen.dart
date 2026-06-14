@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -66,7 +67,7 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: pickedFile.path,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-      uiSettings: [AndroidUiSettings(toolbarTitle: 'Crop Photo'), IOSUiSettings(title: 'Crop Photo')],
+      uiSettings: [AndroidUiSettings(toolbarTitle: L10n.trc('profile_crop_photo')), IOSUiSettings(title: L10n.trc('profile_crop_photo'))],
     );
 
     if (croppedFile != null) {
@@ -82,7 +83,7 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
     if (res.isSuccess) {
       if (!mounted) return;
       context.pop();
-      AppSnackBar.show('Готово', message: 'Данные обновлены');
+      AppSnackBar.show(L10n.trc('common_done'), message: L10n.trc('profile_data_updated'));
       ref.read(mainNotifierProvider.notifier).getAndSyncAllUserData();
     } else {
       AppDialog.showError(error: res.error.toString());
@@ -98,7 +99,7 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Изменить данные', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('profile_edit_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
@@ -118,23 +119,23 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
                         const SizedBox(height: AppSizes.padding * 1.5),
                         AppTextField(
                           controller: nameController,
-                          labelText: 'Имя',
-                          hintText: 'Ваше имя',
+                          labelText: context.tr('profile_name_label'),
+                          hintText: context.tr('profile_name_hint'),
                           onChanged: account.onChangedName,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: emailController,
-                          labelText: 'Почта',
-                          hintText: 'Ваша почта',
+                          labelText: context.tr('profile_email_label'),
+                          hintText: context.tr('profile_email_hint'),
                           keyboardType: TextInputType.emailAddress,
                           onChanged: account.onChangedEmail,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: phoneController,
-                          labelText: 'Телефон номер',
-                          hintText: 'Номер телефона',
+                          labelText: context.tr('profile_phone_label'),
+                          hintText: context.tr('profile_phone_hint'),
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: account.onChangedPhone,
@@ -142,15 +143,15 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: branchController,
-                          labelText: 'Филиал',
-                          hintText: 'Название вашего филиала',
+                          labelText: context.tr('account_branch'),
+                          hintText: context.tr('profile_branch_hint'),
                           onChanged: account.onChangedBranch,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(
                           controller: cashboxController,
-                          labelText: 'Касса',
-                          hintText: 'Название кассы',
+                          labelText: context.tr('account_cashbox'),
+                          hintText: context.tr('profile_cashbox_hint'),
                           onChanged: account.onChangedCashbox,
                         ),
                       ],
@@ -162,7 +163,7 @@ class _ProfileFormScreenState extends ConsumerState<ProfileFormScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(AppSizes.padding),
                     child: AppButton(
-                      text: 'Сохранить',
+                      text: context.tr('common_save'),
                       width: double.infinity,
                       height: 52,
                       fontSize: 18,

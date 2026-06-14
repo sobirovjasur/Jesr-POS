@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/locale/l10n.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
@@ -11,16 +12,17 @@ import '../../../../domain/entities/transaction_entity.dart';
 import '../../../providers/home/home_notifier.dart';
 import '../../../providers/main/main_notifier.dart';
 
-/// Status label + color for a transaction (Продан / Возвращен / Отложенный).
-({String label, Color color}) transactionStatusInfo(String status) {
+/// Status label key + color for a transaction (Продан / Возвращен / Отложенный).
+/// Resolve [labelKey] with `context.tr(...)` (reactive) or `L10n.trc(...)`.
+({String labelKey, Color color}) transactionStatusInfo(String status) {
   switch (status) {
     case 'returned':
-      return (label: 'Возвращен', color: AppColors.error);
+      return (labelKey: 'transaction_status_returned', color: AppColors.error);
     case 'postponed':
-      return (label: 'Отложенный', color: AppColors.warning);
+      return (labelKey: 'transaction_status_postponed', color: AppColors.warning);
     case 'sold':
     default:
-      return (label: 'Продан', color: AppColors.success);
+      return (labelKey: 'transaction_status_sold', color: AppColors.success);
   }
 }
 
@@ -36,9 +38,9 @@ class TransactionCard extends ConsumerWidget {
 
     // While offline, data isn't synced yet — surface every receipt as pending.
     final isOnline = ref.watch(mainNotifierProvider.select((s) => s.isHasInternet));
-    final status = isOnline
-        ? transactionStatusInfo(transaction.status)
-        : (label: 'В процессе', color: AppColors.textSecondary);
+    final info = transactionStatusInfo(transaction.status);
+    final statusLabel = isOnline ? context.tr(info.labelKey) : context.tr('transaction_status_processing');
+    final statusColor = isOnline ? info.color : AppColors.textSecondary;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSizes.padding),
@@ -87,8 +89,8 @@ class TransactionCard extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      status.label,
-                      style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold, color: status.color),
+                      statusLabel,
+                      style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold, color: statusColor),
                     ),
                   ],
                 ),
@@ -96,13 +98,17 @@ class TransactionCard extends ConsumerWidget {
                 Divider(height: 1, color: colorScheme.surfaceContainerHighest),
                 const SizedBox(height: AppSizes.padding / 1.5),
                 _InfoRow(
-                  label: 'Контакт',
+                  label: context.tr('transaction_card_contact'),
                   value: transaction.customerName?.isNotEmpty == true ? transaction.customerName! : '-',
                 ),
                 const SizedBox(height: AppSizes.padding / 2),
-                _InfoRow(label: 'Сумма покупки', value: CurrencyFormatter.format(transaction.totalAmount), bold: true),
+                _InfoRow(
+                  label: context.tr('transaction_card_purchase_amount'),
+                  value: CurrencyFormatter.format(transaction.totalAmount),
+                  bold: true,
+                ),
                 const SizedBox(height: AppSizes.padding / 2),
-                _InfoRow(label: 'Кассир', value: transaction.createdBy?.name ?? '-'),
+                _InfoRow(label: context.tr('receipt_detail_cashier'), value: transaction.createdBy?.name ?? '-'),
               ],
             ),
           ),

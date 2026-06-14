@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/app_providers.dart';
+import '../../../../core/locale/l10n.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../providers/auth/auth_notifier.dart';
 import '../../../widgets/app_button.dart';
@@ -58,7 +59,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     if (res.isSuccess) {
       ref.read(appRoutesProvider).router.refresh();
     } else {
-      _errorNotifier.value = res.error?.toString() ?? 'Неверный логин или пароль, попробуйте ещё раз.';
+      _errorNotifier.value = res.error?.toString() ?? L10n.trc('auth_invalid_credentials_error');
     }
   }
 
@@ -86,11 +87,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   children: [
                     const SizedBox(height: AppSizes.padding / 2),
                     Text(
-                      'Авторизация',
+                      context.tr('auth_sign_in_title'),
                       style: textTheme.displayLarge?.copyWith(fontSize: 28, fontWeight: FontWeight.bold, height: 1.3),
                     ),
                     const SizedBox(height: AppSizes.padding * 1.5),
-                    Text('Логин', style: labelStyle),
+                    Text(context.tr('auth_login_label'), style: labelStyle),
                     const SizedBox(height: AppSizes.padding / 2),
                     PhoneInputField(
                       controller: _phoneController,
@@ -101,8 +102,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     const SizedBox(height: AppSizes.padding),
                     OnboardingTextField(
                       controller: _passwordController,
-                      label: 'Пароль',
-                      hint: 'Введите',
+                      label: context.tr('auth_password_label'),
+                      hint: context.tr('auth_password_hint'),
                       isPassword: true,
                       textInputAction: TextInputAction.done,
                       onSubmitted: _onSubmit,
@@ -135,7 +136,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     listenable: Listenable.merge([_phoneController, _passwordController]),
                     builder: (context, _) {
                       return AppButton(
-                        text: 'Войти',
+                        text: context.tr('auth_sign_in_button'),
                         width: double.infinity,
                         height: 52,
                         fontSize: 18,
@@ -166,7 +167,7 @@ class _RegisterLink extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Нет аккаунта?',
+          context.tr('auth_no_account_text'),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
@@ -174,7 +175,7 @@ class _RegisterLink extends StatelessWidget {
         TextButton(
           onPressed: () => context.push('/register'),
           child: Text(
-            'Регистрация',
+            context.tr('auth_register_link'),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),

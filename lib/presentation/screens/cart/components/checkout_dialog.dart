@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/app_providers.dart';
+import '../../../../core/locale/l10n.dart';
 import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../providers/home/home_notifier.dart';
@@ -18,7 +19,7 @@ class CheckoutDialog {
 
   static void show() {
     AppDialog.show(
-      title: 'Оплата',
+      title: L10n.trc('cart_checkout'),
       child: const _CheckoutDialogBody(),
       showButtons: false,
     );
@@ -80,8 +81,8 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
           autofocus: true,
           keyboardType: TextInputType.number,
           controller: _amountController,
-          labelText: 'Полученная сумма',
-          hintText: 'Введите сумму',
+          labelText: context.tr('checkout_received_amount_label'),
+          hintText: context.tr('checkout_amount_hint'),
           onChanged: (v) {
             homeNotifier.onChangedReceivedAmount(int.tryParse(v) ?? 0);
             // Rebuild so the "Оплатить" button re-evaluates its enabled state.
@@ -92,7 +93,7 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            'Способ оплаты',
+            context.tr('checkout_payment_method'),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontSize: 14,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -110,22 +111,22 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
             borderRadius: AppRadius.cardAll,
           ),
           child: Text(
-            'Наличные',
+            context.tr('checkout_cash'),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
           ),
         ),
         const SizedBox(height: AppSizes.padding),
         AppTextField(
           controller: _customerController,
-          labelText: 'Имя клиента (необязательно)',
-          hintText: 'Напр. Акбар',
+          labelText: context.tr('checkout_customer_name_label'),
+          hintText: context.tr('checkout_customer_hint'),
           onChanged: homeNotifier.onChangedCustomerName,
         ),
         const SizedBox(height: AppSizes.padding),
         AppTextField(
           controller: _descriptionController,
-          labelText: 'Описание (необязательно)',
-          hintText: 'Описание...',
+          labelText: context.tr('checkout_description_label'),
+          hintText: context.tr('checkout_description_hint'),
           onChanged: homeNotifier.onChangedDescription,
         ),
         const SizedBox(height: AppSizes.padding * 1.5),
@@ -133,7 +134,7 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
           children: [
             Expanded(
               child: AppButton(
-                text: 'Отмена',
+                text: context.tr('common_cancel'),
                 buttonColor: Theme.of(context).colorScheme.surface,
                 borderColor: Theme.of(context).colorScheme.primary,
                 textColor: Theme.of(context).colorScheme.primary,
@@ -144,7 +145,7 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
             Expanded(
               flex: 2,
               child: AppButton(
-                text: 'Оплатить',
+                text: context.tr('checkout_pay_button'),
                 enabled: (int.tryParse(_amountController.text) ?? 0) >= homeNotifier.getSelectedTotal(),
                 onTap: _onPay,
               ),

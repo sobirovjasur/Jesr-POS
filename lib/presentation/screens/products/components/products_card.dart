@@ -1,6 +1,7 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/locale/l10n.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
@@ -76,7 +77,7 @@ class ProductsCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Остаток: ${product.stock}',
+                      '${context.tr('products_stock_remaining')} ${product.stock}',
                       overflow: TextOverflow.ellipsis,
                       style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),
@@ -115,7 +116,7 @@ class _OutOfStockOverlay extends StatelessWidget {
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  'Нет в наличии',
+                  context.tr('product_out_of_stock'),
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: colorScheme.outline,

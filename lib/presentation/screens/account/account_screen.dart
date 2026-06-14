@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/locale/app_locale.dart';
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -18,16 +19,16 @@ class AccountScreen extends ConsumerWidget {
 
   void _confirmSignOut(BuildContext context, WidgetRef ref) {
     AppDialog.show(
-      title: 'Внимание',
-      text: 'Хотите выйти из аккаунта?',
-      leftButtonText: 'Нет',
-      rightButtonText: 'Выйти',
+      title: context.tr('common_attention'),
+      text: context.tr('account_confirm_sign_out'),
+      leftButtonText: context.tr('common_no'),
+      rightButtonText: context.tr('account_sign_out'),
       onTapRightButton: (context) async {
         context.pop();
 
         final isSyncronizing = ref.read(mainNotifierProvider).isSyncronizing;
         if (isSyncronizing) {
-          AppSnackBar.showError('Идёт синхронизация', message: 'Дождитесь завершения синхронизации');
+          AppSnackBar.showError(L10n.trc('account_syncing_title'), message: L10n.trc('account_wait_sync'));
           return;
         }
 
@@ -51,22 +52,22 @@ class AccountScreen extends ConsumerWidget {
 
     // Future features (greyed) — open the "Soon" placeholder when tapped.
     final futureItems = <_MenuItem>[
-      _MenuItem(icon: Icons.assessment_outlined, label: 'X Отчет', enabled: false),
-      _MenuItem(icon: Icons.swap_horiz_rounded, label: 'Взаиморасчет', enabled: false),
-      _MenuItem(icon: Icons.currency_exchange_rounded, label: 'Обмен валюты', enabled: false),
-      _MenuItem(icon: Icons.payments_outlined, label: 'Затраты', enabled: false),
-      _MenuItem(icon: Icons.sell_outlined, label: 'Цены', enabled: false),
-      _MenuItem(icon: Icons.notifications_none_rounded, label: 'Уведомления', enabled: false),
+      _MenuItem(icon: Icons.assessment_outlined, label: context.tr('account_x_report'), enabled: false),
+      _MenuItem(icon: Icons.swap_horiz_rounded, label: context.tr('account_mutual_settlement'), enabled: false),
+      _MenuItem(icon: Icons.currency_exchange_rounded, label: context.tr('account_currency_exchange'), enabled: false),
+      _MenuItem(icon: Icons.payments_outlined, label: context.tr('account_expenses'), enabled: false),
+      _MenuItem(icon: Icons.sell_outlined, label: context.tr('account_prices'), enabled: false),
+      _MenuItem(icon: Icons.notifications_none_rounded, label: context.tr('account_notifications'), enabled: false),
     ];
 
     final mainItems = <_MenuItem>[
       _MenuItem(
         icon: Icons.print_outlined,
-        label: 'Настройки принтера',
+        label: context.tr('account_printer_settings'),
         onTap: () => context.push('/account/printer-settings'),
       ),
-      _MenuItem(icon: Icons.palette_outlined, label: 'Оформления', onTap: () => context.push('/account/appearance')),
-      _MenuItem(icon: Icons.info_outline_rounded, label: 'О приложении', onTap: () => context.push('/account/about')),
+      _MenuItem(icon: Icons.palette_outlined, label: context.tr('account_appearance'), onTap: () => context.push('/account/appearance')),
+      _MenuItem(icon: Icons.info_outline_rounded, label: context.tr('account_about_app'), onTap: () => context.push('/account/about')),
     ];
 
     return Scaffold(
@@ -89,7 +90,7 @@ class AccountScreen extends ConsumerWidget {
                 items: [
                   _MenuItem(
                     icon: Icons.logout_rounded,
-                    label: 'Выйти',
+                    label: context.tr('account_sign_out'),
                     color: colorScheme.error,
                     onTap: () => _confirmSignOut(context, ref),
                   ),
@@ -138,7 +139,7 @@ class _ProfileHeader extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user?.name?.isNotEmpty == true ? user!.name! : 'Без имени',
+                    user?.name?.isNotEmpty == true ? user!.name! : context.tr('account_no_name'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -157,9 +158,9 @@ class _ProfileHeader extends ConsumerWidget {
         const SizedBox(height: AppSizes.padding),
         Row(
           children: [
-            Expanded(child: _InfoChip(label: 'Филиал', value: user?.branch?.isNotEmpty == true ? user!.branch! : '—')),
+            Expanded(child: _InfoChip(label: context.tr('account_branch'), value: user?.branch?.isNotEmpty == true ? user!.branch! : '—')),
             const SizedBox(width: AppSizes.padding / 2),
-            Expanded(child: _InfoChip(label: 'Касса', value: user?.cashbox?.isNotEmpty == true ? user!.cashbox! : '—')),
+            Expanded(child: _InfoChip(label: context.tr('account_cashbox'), value: user?.cashbox?.isNotEmpty == true ? user!.cashbox! : '—')),
           ],
         ),
       ],

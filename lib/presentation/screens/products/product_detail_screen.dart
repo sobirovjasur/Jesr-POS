@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -48,7 +49,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Детали товара', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('product_details_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: _onBack,
@@ -62,7 +63,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           }
 
           if (snapshot.hasError || snapshot.data == null) {
-            return const AppEmptyState(title: 'Товар не найден');
+            return AppEmptyState(title: context.tr('empty_product_not_found'));
           }
 
           final product = snapshot.data!;
@@ -80,7 +81,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(AppSizes.padding),
                   child: AppButton(
-                    text: 'Изменить товар',
+                    text: context.tr('product_edit_button'),
                     width: double.infinity,
                     height: 52,
                     fontSize: 18,
@@ -130,20 +131,20 @@ class _DetailBody extends StatelessWidget {
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
         ),
         const SizedBox(height: AppSizes.padding * 1.5),
-        Text('Информация о товаре', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(context.tr('product_info_section'), style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: AppSizes.padding),
         Row(
           children: [
-            _InfoChip(label: 'Остаток', value: '${product.stock}'),
+            _InfoChip(label: context.tr('product_stock_label'), value: '${product.stock}'),
             const SizedBox(width: AppSizes.padding / 2),
-            _InfoChip(label: 'Продано', value: '${product.sold ?? 0}'),
+            _InfoChip(label: context.tr('product_sold_label'), value: '${product.sold ?? 0}'),
           ],
         ),
         const SizedBox(height: AppSizes.padding / 2),
-        _InfoChip(label: 'Добавлено', value: DateTimeFormatter.dotDateWithSlashClock(product.createdAt ?? '')),
+        _InfoChip(label: context.tr('product_added_label'), value: DateTimeFormatter.dotDateWithSlashClock(product.createdAt ?? '')),
         const SizedBox(height: AppSizes.padding / 2),
         _InfoChip(
-          label: 'Последнее обновление',
+          label: context.tr('product_updated_label'),
           value: DateTimeFormatter.dotDateWithSlashClock(product.updatedAt ?? ''),
         ),
         const SizedBox(height: AppSizes.padding * 1.5),
@@ -208,7 +209,7 @@ class _DescriptionTabsState extends State<_DescriptionTabs> {
     final content = isDescription ? widget.product.description : widget.product.specifications;
     final text = content?.isNotEmpty == true
         ? content!
-        : (isDescription ? 'Нет описания' : 'Нет характеристик');
+        : (isDescription ? context.tr('empty_no_description') : context.tr('empty_no_specifications'));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,8 +222,8 @@ class _DescriptionTabsState extends State<_DescriptionTabs> {
           ),
           child: Row(
             children: [
-              _TabButton(label: 'Описание', selected: isDescription, onTap: () => setState(() => _tab = 0)),
-              _TabButton(label: 'Характеристики', selected: !isDescription, onTap: () => setState(() => _tab = 1)),
+              _TabButton(label: context.tr('product_description_tab'), selected: isDescription, onTap: () => setState(() => _tab = 0)),
+              _TabButton(label: context.tr('product_specs_tab'), selected: !isDescription, onTap: () => setState(() => _tab = 1)),
             ],
           ),
         ),
@@ -243,7 +244,7 @@ class _DescriptionTabsState extends State<_DescriptionTabs> {
             child: GestureDetector(
               onTap: () => setState(() => _expanded = !_expanded),
               child: Text(
-                _expanded ? 'Скрыть' : 'Показать ещё',
+                _expanded ? context.tr('product_hide_text') : context.tr('product_show_more'),
                 style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
               ),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/app_providers.dart';
+import '../../../../core/locale/l10n.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../providers/auth/auth_notifier.dart';
 import '../../../widgets/app_button.dart';
@@ -54,10 +55,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _confirmController.text.isNotEmpty;
 
   String? _validate() {
-    if (_nameController.text.trim().isEmpty) return 'Введите имя';
-    if (!_hasPhone) return 'Введите номер телефона';
-    if (_passwordController.text.length < 6) return 'Пароль должен содержать не менее 6 символов';
-    if (_passwordController.text != _confirmController.text) return 'Пароли не совпадают';
+    if (_nameController.text.trim().isEmpty) return L10n.trc('auth_enter_name_error');
+    if (!_hasPhone) return L10n.trc('auth_enter_phone_error');
+    if (_passwordController.text.length < 6) return L10n.trc('auth_password_length_error');
+    if (_passwordController.text != _confirmController.text) return L10n.trc('auth_passwords_mismatch_error');
 
     return null;
   }
@@ -83,7 +84,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (res.isSuccess) {
       ref.read(appRoutesProvider).router.refresh();
     } else {
-      _errorNotifier.value = res.error?.toString() ?? 'Не удалось зарегистрироваться. Попробуйте ещё раз.';
+      _errorNotifier.value = res.error?.toString() ?? L10n.trc('auth_registration_error');
     }
   }
 
@@ -111,33 +112,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Введите свои данные',
+                      context.tr('auth_register_title'),
                       style: textTheme.displayLarge?.copyWith(fontSize: 28, fontWeight: FontWeight.bold, height: 1.3),
                     ),
                     const SizedBox(height: AppSizes.padding * 1.5),
                     OnboardingTextField(
                       controller: _nameController,
-                      label: 'Имя',
-                      hint: 'Введите',
+                      label: context.tr('auth_name_label'),
+                      hint: context.tr('auth_password_hint'),
                       textInputAction: TextInputAction.next,
                     ),
                     if (widget.phone == null) ...[
                       const SizedBox(height: AppSizes.padding),
-                      AuthPhoneField(controller: _phoneController, labelText: 'Номер телефона'),
+                      AuthPhoneField(controller: _phoneController, labelText: context.tr('auth_phone_number_label')),
                     ],
                     const SizedBox(height: AppSizes.padding),
                     OnboardingTextField(
                       controller: _passwordController,
-                      label: 'Пароль',
-                      hint: 'Введите пароль',
+                      label: context.tr('auth_password_label'),
+                      hint: context.tr('auth_password_hint_long'),
                       isPassword: true,
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: AppSizes.padding),
                     OnboardingTextField(
                       controller: _confirmController,
-                      label: 'Подтвердите пароль',
-                      hint: 'Повторите пароль',
+                      label: context.tr('auth_confirm_password_label'),
+                      hint: context.tr('auth_repeat_password_hint'),
                       isPassword: true,
                       textInputAction: TextInputAction.done,
                       onSubmitted: _onSubmit,
@@ -175,7 +176,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ]),
                     builder: (context, _) {
                       return AppButton(
-                        text: 'Подтвердить',
+                        text: context.tr('auth_confirm_button'),
                         width: double.infinity,
                         height: 52,
                         fontSize: 18,

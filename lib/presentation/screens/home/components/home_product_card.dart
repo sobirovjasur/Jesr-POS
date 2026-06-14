@@ -2,6 +2,7 @@ import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/l10n.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
@@ -89,7 +90,7 @@ class HomeProductCard extends ConsumerWidget {
                   ],
                   Expanded(
                     child: Text(
-                      '$displayQty x ${CurrencyFormatter.format(product.price)}/шт',
+                      '$displayQty x ${CurrencyFormatter.format(product.price)}${context.tr('product_per_unit')}',
                       overflow: TextOverflow.ellipsis,
                       style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),
@@ -142,7 +143,7 @@ class _OutOfStockOverlay extends StatelessWidget {
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  'Нет в наличии',
+                  context.tr('product_out_of_stock'),
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: colorScheme.outline,

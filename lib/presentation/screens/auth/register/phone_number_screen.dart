@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/locale/l10n.dart';
 import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../widgets/app_button.dart';
@@ -70,17 +71,17 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
             children: [
               const SizedBox(height: AppSizes.padding / 2),
               Text(
-                'Ваш номер телефона',
+                context.tr('auth_phone_number_title'),
                 style: textTheme.displayLarge?.copyWith(fontSize: 28, fontWeight: FontWeight.bold, height: 1.3),
               ),
               const SizedBox(height: AppSizes.padding / 2),
               Text(
-                'Мы отправим код подтверждения на ваш Телеграм',
+                context.tr('auth_confirmation_code_telegram'),
                 style: textTheme.bodyMedium?.copyWith(fontSize: 16, color: colorScheme.outlineVariant, height: 1.3),
               ),
               const SizedBox(height: AppSizes.padding * 1.75),
               Text(
-                'Номер телефона',
+                context.tr('auth_phone_number_label'),
                 style: textTheme.bodySmall?.copyWith(fontSize: 14, color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: AppSizes.padding / 2),
@@ -93,7 +94,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
               ),
               const Spacer(),
               AppButton(
-                text: 'Подтвердить',
+                text: context.tr('auth_confirm_button'),
                 width: double.infinity,
                 height: 52,
                 fontSize: 18,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -62,12 +63,12 @@ class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScree
 
   String _buildReceipt(TransactionEntity t) {
     final lines = <String>[
-      'Чек № ${t.id ?? '-'}',
-      'Статус: ${transactionStatusInfo(t.status).label}',
-      'Дата: ${DateTimeFormatter.dotDateWithClock(t.createdAt ?? '')}',
-      'Кассир: ${t.createdBy?.name ?? '-'}',
-      'Способ оплаты: ${_paymentLabel(t.paymentMethod)}',
-      if (t.description?.isNotEmpty == true) 'Описание: ${t.description}',
+      '${L10n.trc('receipt_detail_number')}: ${t.id ?? '-'}',
+      '${L10n.trc('receipt_share_status')}: ${L10n.trc(transactionStatusInfo(t.status).labelKey)}',
+      '${L10n.trc('receipt_share_date')}: ${DateTimeFormatter.dotDateWithClock(t.createdAt ?? '')}',
+      '${L10n.trc('receipt_detail_cashier')}: ${t.createdBy?.name ?? '-'}',
+      '${L10n.trc('receipt_detail_payment_method')}: ${_paymentLabel(t.paymentMethod)}',
+      if (t.description?.isNotEmpty == true) '${L10n.trc('common_description')}: ${t.description}',
       '',
     ];
 
@@ -77,9 +78,9 @@ class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScree
 
     lines.addAll([
       '',
-      'Итого: ${CurrencyFormatter.format(t.totalAmount)}',
-      'Получено: ${t.receivedAmount > 0 ? CurrencyFormatter.format(t.receivedAmount) : '-'}',
-      'Сдача: ${t.returnAmount > 0 ? CurrencyFormatter.format(t.returnAmount) : '-'}',
+      '${L10n.trc('receipt_share_total')}: ${CurrencyFormatter.format(t.totalAmount)}',
+      '${L10n.trc('receipt_share_received')}: ${t.receivedAmount > 0 ? CurrencyFormatter.format(t.receivedAmount) : '-'}',
+      '${L10n.trc('receipt_detail_change')}: ${t.returnAmount > 0 ? CurrencyFormatter.format(t.returnAmount) : '-'}',
     ]);
 
     return lines.join('\n');
@@ -92,7 +93,7 @@ class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScree
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Чеки', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('receipts_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: _onBack,
@@ -106,7 +107,7 @@ class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScree
           }
 
           if (snapshot.hasError || snapshot.data == null) {
-            return const AppEmptyState(title: 'Чек не найден');
+            return AppEmptyState(title: context.tr('receipt_not_found'));
           }
 
           final transaction = snapshot.data!;
@@ -125,7 +126,7 @@ class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScree
                   padding: const EdgeInsets.all(AppSizes.padding),
                   child: Builder(
                     builder: (btnContext) => AppButton(
-                      text: 'Поделиться',
+                      text: context.tr('common_share'),
                       width: double.infinity,
                       height: 52,
                       fontSize: 18,
@@ -142,14 +143,14 @@ class _TransactionDetailScreenState extends ConsumerState<TransactionDetailScree
   }
 }
 
-String _paymentLabel(String method) => method == 'cash' ? 'Наличные' : method;
+String _paymentLabel(String method) => method == 'cash' ? L10n.trc('payment_method_cash') : method;
 
-/// Icon + title for the success / error header.
-({Widget icon, String title}) _statusHeader(String status) {
+/// Icon + title key for the success / error header.
+({Widget icon, String titleKey}) _statusHeader(String status) {
   if (status == 'returned') {
     return (
       icon: const Icon(Icons.warning_rounded, color: AppColors.error, size: 64),
-      title: 'Оплата не выполнена',
+      titleKey: 'payment_failed_title',
     );
   }
   return (
@@ -159,7 +160,7 @@ String _paymentLabel(String method) => method == 'cash' ? 'Наличные' : m
       decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
       child: const Icon(Icons.check_rounded, color: AppColors.onPrimary, size: 38),
     ),
-    title: 'Оплата прошла успешно',
+    titleKey: 'payment_success_title',
   );
 }
 
@@ -177,16 +178,16 @@ class _DetailCard extends StatelessWidget {
     final t = transaction;
 
     final rows = <({String label, String value, bool bold})>[
-      (label: 'Номер чека', value: '${t.id ?? '-'}', bold: false),
-      (label: 'Способ оплаты', value: _paymentLabel(t.paymentMethod), bold: false),
-      (label: 'Кассир', value: t.createdBy?.name ?? '-', bold: false),
-      (label: 'Дата и время', value: DateTimeFormatter.dotDateWithClock(t.createdAt ?? ''), bold: false),
-      (label: 'Описание', value: t.description?.isNotEmpty == true ? t.description! : '-', bold: false),
-      (label: 'Количество товаров', value: '${t.totalOrderedProduct}', bold: false),
-      (label: 'Итоговая сумма', value: CurrencyFormatter.format(t.totalAmount), bold: true),
-      (label: 'Сдача', value: t.returnAmount > 0 ? CurrencyFormatter.format(t.returnAmount) : '-', bold: false),
+      (label: context.tr('receipt_detail_number'), value: '${t.id ?? '-'}', bold: false),
+      (label: context.tr('receipt_detail_payment_method'), value: _paymentLabel(t.paymentMethod), bold: false),
+      (label: context.tr('receipt_detail_cashier'), value: t.createdBy?.name ?? '-', bold: false),
+      (label: context.tr('receipt_detail_datetime'), value: DateTimeFormatter.dotDateWithClock(t.createdAt ?? ''), bold: false),
+      (label: context.tr('common_description'), value: t.description?.isNotEmpty == true ? t.description! : '-', bold: false),
+      (label: context.tr('receipt_detail_product_count'), value: '${t.totalOrderedProduct}', bold: false),
+      (label: context.tr('receipt_detail_total_sum'), value: CurrencyFormatter.format(t.totalAmount), bold: true),
+      (label: context.tr('receipt_detail_change'), value: t.returnAmount > 0 ? CurrencyFormatter.format(t.returnAmount) : '-', bold: false),
       (
-        label: 'Полученная сумма',
+        label: context.tr('receipt_detail_received_sum'),
         value: t.receivedAmount > 0 ? CurrencyFormatter.format(t.receivedAmount) : '-',
         bold: true,
       ),
@@ -207,7 +208,7 @@ class _DetailCard extends StatelessWidget {
                 header.icon,
                 const SizedBox(height: AppSizes.padding),
                 Text(
-                  header.title,
+                  context.tr(header.titleKey),
                   textAlign: TextAlign.center,
                   style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),

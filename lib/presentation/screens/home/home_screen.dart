@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -84,7 +85,7 @@ class _CartBar extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSizes.padding),
       color: Theme.of(context).colorScheme.surfaceContainerLowest,
       child: AppButton(
-        text: 'Перейти в корзину',
+        text: context.tr('home_go_to_cart'),
         width: double.infinity,
         height: 52,
         fontSize: 18,
@@ -182,7 +183,7 @@ class _SyncChip extends ConsumerWidget {
     final isOnline = ref.watch(mainNotifierProvider.select((p) => p.isHasInternet));
 
     final color = isOnline ? AppColors.success : AppColors.textTertiary;
-    final label = isOnline ? 'Онлайн' : 'Офлайн';
+    final label = isOnline ? context.tr('home_online') : context.tr('home_offline');
     final icon = isOnline ? Icons.cloud_done_rounded : Icons.cloud_off_rounded;
 
     return Material(
@@ -205,7 +206,7 @@ class _SyncChip extends ConsumerWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                isSyncronizing ? 'Синхр.' : label,
+                isSyncronizing ? context.tr('home_syncing') : label,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: color),
               ),
             ],
@@ -240,11 +241,11 @@ class _ProductGrid extends ConsumerWidget {
                 child: Padding(padding: EdgeInsets.only(bottom: 140), child: AppProgressIndicator()),
               )
             else if (allProducts.isEmpty)
-              const SliverFillRemaining(
+              SliverFillRemaining(
                 hasScrollBody: false,
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 140),
-                  child: AppEmptyState(subtitle: 'Mahsulotlar yo\'q'),
+                  padding: const EdgeInsets.only(bottom: 140),
+                  child: AppEmptyState(subtitle: context.tr('empty_products')),
                 ),
               )
             else

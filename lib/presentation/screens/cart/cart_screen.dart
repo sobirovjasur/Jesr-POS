@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -21,10 +22,10 @@ class CartScreen extends ConsumerWidget {
 
   void _confirmClearAll(WidgetRef ref) {
     AppDialog.show(
-      title: 'Внимание',
-      text: 'Хотите очистить все товары?',
-      leftButtonText: 'Нет',
-      rightButtonText: 'Да',
+      title: L10n.trc('common_attention'),
+      text: L10n.trc('cart_confirm_clear_all'),
+      leftButtonText: L10n.trc('common_no'),
+      rightButtonText: L10n.trc('common_yes'),
       onTapRightButton: (context) {
         ref.read(homeNotifierProvider.notifier).onRemoveAllOrderedProduct();
         context.pop();
@@ -38,7 +39,7 @@ class CartScreen extends ConsumerWidget {
     if (res.isSuccess) {
       if (context.mounted) context.pop();
     } else {
-      AppSnackBar.showError(res.error?.toString() ?? 'Ошибка');
+      AppSnackBar.showError(res.error?.toString() ?? L10n.trc('common_error'));
     }
   }
 
@@ -56,14 +57,14 @@ class CartScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Корзина', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(context.tr('cart_title'), style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
         ),
       ),
       body: items.isEmpty
-          ? const AppEmptyState(title: 'Корзина пуста', subtitle: 'Добавьте товары на главном экране')
+          ? AppEmptyState(title: context.tr('empty_cart_title'), subtitle: context.tr('empty_cart_subtitle'))
           : Column(
               children: [
                 Expanded(
@@ -90,7 +91,7 @@ class CartScreen extends ConsumerWidget {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Корзина', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+                                    Text(context.tr('cart_title'), style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
                                     IconButton(
                                       icon: Icon(Icons.delete_outline_rounded, color: colorScheme.error),
                                       onPressed: () => _confirmClearAll(ref),
@@ -113,7 +114,7 @@ class CartScreen extends ConsumerWidget {
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      'Возврат по закупам',
+                                      context.tr('cart_returns_section'),
                                       style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -128,18 +129,18 @@ class CartScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSizes.padding),
                         _SummaryRow(
-                          label: 'Товары (${selected.length})',
+                          label: '${context.tr('cart_items')} (${selected.length})',
                           value: CurrencyFormatter.withoutSymbol(selectedTotal),
                         ),
                         const SizedBox(height: AppSizes.padding / 2),
                         _SummaryRow(
-                          label: 'Итого к оплате',
+                          label: context.tr('cart_total_amount'),
                           value: CurrencyFormatter.withoutSymbol(selectedTotal),
                           bold: true,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppButton(
-                          text: 'Отложить',
+                          text: context.tr('cart_postpone'),
                           width: double.infinity,
                           height: 50,
                           buttonColor: colorScheme.surfaceContainerLow,
@@ -155,7 +156,7 @@ class CartScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSizes.padding),
                   color: colorScheme.surfaceContainerLowest,
                   child: AppButton(
-                    text: 'Оплата',
+                    text: context.tr('cart_checkout'),
                     width: double.infinity,
                     height: 52,
                     fontSize: 18,
@@ -244,7 +245,7 @@ class _CartItemTile extends ConsumerWidget {
                   style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${CurrencyFormatter.format(item.price)}/шт',
+                  '${CurrencyFormatter.format(item.price)}${context.tr('product_per_unit')}',
                   style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: AppSizes.padding / 2),
