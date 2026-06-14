@@ -4,6 +4,10 @@ class Constants {
 
   static const googleServerClientId = String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID');
 
+  /// API key for remove.bg (background removal on product/profile images).
+  /// Supplied via `--dart-define REMOVE_BG_API_KEY=...` (e.g. in config.json).
+  static const removeBgApiKey = String.fromEnvironment('REMOVE_BG_API_KEY');
+
   /// Default country dialing code prefixed to phone-based logins.
   static const String phoneCountryCode = '+998';
 

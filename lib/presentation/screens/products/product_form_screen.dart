@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/services/image/background_removal_service.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../providers/products/product_form_notifier.dart';
 import '../../widgets/app_button.dart';
@@ -76,8 +77,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     );
 
     if (croppedFile != null) {
-      var file = File(croppedFile.path);
-      ref.read(productFormNotifierProvider.notifier).onChangedImage(file);
+      final file = File(croppedFile.path);
+
+      // Best-effort background removal -> transparent PNG. Falls back to the
+      // original image if no API key is set or the request fails.
+      final noBgFile = await AppDialog.showProgress(() => BackgroundRemovalService.removeBackground(file));
+
+      ref.read(productFormNotifierProvider.notifier).onChangedImage(noBgFile ?? file);
     }
   }
 
