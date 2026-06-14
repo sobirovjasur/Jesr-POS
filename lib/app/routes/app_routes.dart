@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../presentation/providers/auth/auth_notifier.dart';
 import '../../presentation/screens/account/about_screen.dart';
 import '../../presentation/screens/account/account_screen.dart';
+import '../../presentation/screens/account/appearance_screen.dart';
 import '../../presentation/screens/account/printer_settings_screen.dart';
 import '../../presentation/screens/account/profile_form_screen.dart';
 import '../../presentation/screens/auth/register/phone_number_screen.dart';
@@ -242,7 +243,15 @@ class AppRoutes {
         _profileEdit(),
         _about(),
         _printerSettings(),
+        _appearance(),
       ],
+    );
+  }
+
+  GoRoute _appearance() {
+    return GoRoute(
+      path: 'appearance',
+      builder: (context, state) => const AppearanceScreen(),
     );
   }
 

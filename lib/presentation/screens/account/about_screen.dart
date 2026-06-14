@@ -1,11 +1,10 @@
-import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../../core/assets/assets.dart';
 import '../../../core/themes/app_sizes.dart';
-import '../../../core/utilities/external_launcher.dart';
 
+/// About screen (Figma 22 — "О приложении").
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
 
@@ -14,155 +13,68 @@ class AboutScreen extends StatefulWidget {
 }
 
 class _AboutScreenState extends State<AboutScreen> {
-  String appName = '';
   String packageName = '';
   String version = '';
-  String buildNumber = '';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-      appName = packageInfo.appName;
-      packageName = packageInfo.packageName;
-      version = packageInfo.version;
-      buildNumber = packageInfo.buildNumber;
-
-      setState(() {});
+      final info = await PackageInfo.fromPlatform();
+      packageName = info.packageName;
+      version = info.version;
+      if (mounted) setState(() {});
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final muted = textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant);
+    final body = textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant, height: 1.45);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About'),
-        titleSpacing: 0,
+        centerTitle: true,
+        title: Text('О приложении', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => context.pop(),
+        ),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSizes.padding),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const AppImage(
-                image: Assets.welcome,
-                imgProvider: ImgProvider.assetImage,
-                width: 150,
-              ),
-              const SizedBox(height: AppSizes.padding),
-              Text(
-                'Flutter POS',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                packageName,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-              Text(
-                'version $version',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-              const SizedBox(height: AppSizes.padding),
-              Text(
-                'A Point of Sale (POS) application built with Flutter, demonstrating Clean Architecture principles and offline-first design patterns.',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: AppSizes.padding * 2),
-              Text(
-                "This project serves as a learning resource and reference implementation for building Flutter apps with proper architecture and automatic data synchronization between local storage (SQLite) and cloud database (Firestore).\n\nThe app prioritizes local-first operations, storing all data in SQLite and automatically syncing with Firestore when online. When offline, all user actions (create, update, delete) are recorded as QueuedActions in the local database and automatically executed in sequence when internet connectivity is restored.",
-                textAlign: TextAlign.justify,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: AppSizes.padding),
-              Row(
-                children: [
-                  Text(
-                    "Developed with ❤️ by",
-                    textAlign: TextAlign.justify,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "Elriz Wiraswara",
-                    textAlign: TextAlign.justify,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSizes.padding / 2),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "GitHub",
-                        textAlign: TextAlign.justify,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.open_in_new,
-                        size: 12,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    ExternalLauncher.openUrl('https://github.com/elrizwiraswara');
-                  },
-                ),
-              ),
-              const SizedBox(height: AppSizes.padding / 4),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Website",
-                        textAlign: TextAlign.justify,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.open_in_new,
-                        size: 12,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    ExternalLauncher.openUrl('https://elriztechnology.com');
-                  },
-                ),
-              ),
-            ],
-          ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSizes.padding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Jesr POS', style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: AppSizes.padding / 4),
+            Text(packageName, style: muted),
+            Text('version $version', style: muted),
+            const SizedBox(height: AppSizes.padding),
+            Text(
+              'POS-приложение (точка продаж), разработанное на Flutter и демонстрирующее принципы чистой '
+              'архитектуры (Clean Architecture) и подход offline-first в проектировании.',
+              style: body,
+            ),
+            const SizedBox(height: AppSizes.padding),
+            Text(
+              'Этот проект служит учебным ресурсом и эталонной реализацией с правильной архитектурой и '
+              'автоматической синхронизацией данных между локальным хранилищем (SQLite) и облачной базой '
+              'данных (Firestore).',
+              style: body,
+            ),
+            const SizedBox(height: AppSizes.padding),
+            Text(
+              'Приложение работает по принципу local-first: все данные хранятся в SQLite и автоматически '
+              'синхронизируются с Firestore при наличии интернет-соединения. В офлайн-режиме все действия '
+              'пользователя (создание, обновление, удаление) записываются как QueuedActions в локальную базу '
+              'данных и автоматически выполняются по очереди после восстановления интернет-соединения.',
+              style: body,
+            ),
+          ],
         ),
       ),
     );
