@@ -12,6 +12,7 @@ import '../../providers/home/home_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_empty_state.dart';
+import '../../widgets/app_snack_bar.dart';
 import 'components/checkout_dialog.dart';
 
 /// Cart screen (Figma 07/08 — "Корзина").
@@ -31,13 +32,27 @@ class CartScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _onPostpone(BuildContext context, WidgetRef ref) async {
+    final res = await AppDialog.showProgress(ref.read(homeNotifierProvider.notifier).postpone);
+
+    if (res.isSuccess) {
+      if (context.mounted) context.pop();
+    } else {
+      AppSnackBar.showError(res.error?.toString() ?? 'Ошибка');
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(homeNotifierProvider.select((s) => s.orderedProducts));
+    final unselectedIds = ref.watch(homeNotifierProvider.select((s) => s.unselectedProductIds));
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final total = items.fold<int>(0, (sum, e) => sum + e.price * e.quantity);
+    final entries = items.asMap().entries.toList();
+    final selected = entries.where((e) => !unselectedIds.contains(e.value.productId)).toList();
+    final unselected = entries.where((e) => unselectedIds.contains(e.value.productId)).toList();
+    final selectedTotal = selected.fold<int>(0, (sum, e) => sum + e.value.price * e.value.quantity);
 
     return Scaffold(
       appBar: AppBar(
@@ -84,17 +99,45 @@ class CartScreen extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                              for (var i = 0; i < items.length; i++) ...[
+                              for (final e in selected) ...[
                                 Divider(height: 1, color: colorScheme.surfaceContainerHighest),
-                                _CartItemTile(item: items[i], index: i),
+                                _CartItemTile(item: e.value, index: e.key, selected: true),
+                              ],
+                              if (unselected.isNotEmpty) ...[
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    AppSizes.padding,
+                                    AppSizes.padding,
+                                    AppSizes.padding,
+                                    AppSizes.padding / 2,
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Возврат по закупам',
+                                      style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                for (final e in unselected) ...[
+                                  Divider(height: 1, color: colorScheme.surfaceContainerHighest),
+                                  _CartItemTile(item: e.value, index: e.key, selected: false),
+                                ],
                               ],
                             ],
                           ),
                         ),
                         const SizedBox(height: AppSizes.padding),
-                        _SummaryRow(label: 'Товары (${items.length})', value: CurrencyFormatter.withoutSymbol(total)),
+                        _SummaryRow(
+                          label: 'Товары (${selected.length})',
+                          value: CurrencyFormatter.withoutSymbol(selectedTotal),
+                        ),
                         const SizedBox(height: AppSizes.padding / 2),
-                        _SummaryRow(label: 'Итого к оплате', value: CurrencyFormatter.withoutSymbol(total), bold: true),
+                        _SummaryRow(
+                          label: 'Итого к оплате',
+                          value: CurrencyFormatter.withoutSymbol(selectedTotal),
+                          bold: true,
+                        ),
                         const SizedBox(height: AppSizes.padding),
                         AppButton(
                           text: 'Отложить',
@@ -103,7 +146,7 @@ class CartScreen extends ConsumerWidget {
                           buttonColor: colorScheme.surfaceContainerLow,
                           borderColor: colorScheme.surfaceContainerLow,
                           textColor: colorScheme.onSurface,
-                          onTap: () => context.pop(),
+                          onTap: () => _onPostpone(context, ref),
                         ),
                       ],
                     ),
@@ -117,6 +160,8 @@ class CartScreen extends ConsumerWidget {
                     width: double.infinity,
                     height: 52,
                     fontSize: 18,
+                    enabled: selected.isNotEmpty,
+                    disabledButtonColor: colorScheme.surfaceContainerLow,
                     onTap: () => CheckoutDialog.show(),
                   ),
                 ),
@@ -160,8 +205,9 @@ class _SummaryRow extends StatelessWidget {
 class _CartItemTile extends ConsumerWidget {
   final OrderedProductEntity item;
   final int index;
+  final bool selected;
 
-  const _CartItemTile({required this.item, required this.index});
+  const _CartItemTile({required this.item, required this.index, required this.selected});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -222,9 +268,16 @@ class _CartItemTile extends ConsumerWidget {
               ],
             ),
           ),
-          IconButton(
-            icon: Icon(Icons.more_vert_rounded, color: colorScheme.onSurfaceVariant),
-            onPressed: () => notifier.onRemoveOrderedProduct(item),
+          SizedBox(
+            width: 28,
+            height: 28,
+            child: Checkbox(
+              value: selected,
+              onChanged: (_) => notifier.toggleSelection(item.productId),
+              activeColor: colorScheme.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              side: BorderSide(color: colorScheme.surfaceContainerHighest, width: 1.5),
+            ),
           ),
         ],
       ),

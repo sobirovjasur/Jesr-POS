@@ -51,7 +51,7 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
 
     context.pop();
 
-    final res = await AppDialog.showProgress(homeNotifier.createTransaction);
+    final res = await AppDialog.showProgress(homeNotifier.pay);
 
     if (res.isSuccess) {
       router.go('/transactions/transaction-detail/${res.data}');
@@ -132,7 +132,7 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
               flex: 2,
               child: AppButton(
                 text: 'Оплатить',
-                enabled: (int.tryParse(_amountController.text) ?? 0) >= homeNotifier.getTotalAmount(),
+                enabled: (int.tryParse(_amountController.text) ?? 0) >= homeNotifier.getSelectedTotal(),
                 onTap: _onPay,
               ),
             ),

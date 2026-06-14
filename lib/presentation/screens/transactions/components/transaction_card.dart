@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/themes/app_colors.dart';
@@ -7,6 +8,7 @@ import '../../../../core/themes/app_sizes.dart';
 import '../../../../core/utilities/currency_formatter.dart';
 import '../../../../core/utilities/date_time_formatter.dart';
 import '../../../../domain/entities/transaction_entity.dart';
+import '../../../providers/home/home_notifier.dart';
 
 /// Status label + color for a transaction (Продан / Возвращен / Отложенный).
 ({String label, Color color}) transactionStatusInfo(String status) {
@@ -21,13 +23,13 @@ import '../../../../domain/entities/transaction_entity.dart';
   }
 }
 
-class TransactionCard extends StatelessWidget {
+class TransactionCard extends ConsumerWidget {
   final TransactionEntity transaction;
 
   const TransactionCard({super.key, required this.transaction});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final status = transactionStatusInfo(transaction.status);
@@ -38,7 +40,14 @@ class TransactionCard extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: AppRadius.cardAll,
         child: InkWell(
-          onTap: () => context.push('/transactions/transaction-detail/${transaction.id}'),
+          onTap: () {
+            if (transaction.status == 'postponed') {
+              ref.read(homeNotifierProvider.notifier).resumePostponed(transaction);
+              context.push('/cart');
+            } else {
+              context.push('/transactions/transaction-detail/${transaction.id}');
+            }
+          },
           borderRadius: AppRadius.cardAll,
           child: Ink(
             padding: const EdgeInsets.all(AppSizes.padding),
