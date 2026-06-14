@@ -1,6 +1,7 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
 import '../../../../core/utilities/currency_formatter.dart';
@@ -42,24 +43,24 @@ class ProductsCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Stack(
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: AppImage(
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      AppImage(
                         image: product.imageUrl,
                         borderRadius: AppRadius.cardAll,
                         border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.surfaceContainerHighest),
-                        backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+                        backgroundColor: AppColors.imageBackground,
                         errorWidget: Icon(
                           Icons.image,
                           color: Theme.of(context).colorScheme.surfaceDim,
                           size: 32,
                         ),
                       ),
-                    ),
-                    product.stock <= 0 ? _OutOfStock() : const SizedBox.shrink(),
-                  ],
+                      if (product.stock <= 0) Positioned.fill(child: _OutOfStock()),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -108,45 +109,42 @@ class _OutOfStock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
+    return Container(
+      padding: const EdgeInsets.all(6),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white70,
+        borderRadius: AppRadius.cardAll,
+      ),
       child: Container(
-        padding: const EdgeInsets.all(6),
-        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSizes.padding / 4,
+          horizontal: AppSizes.padding / 2,
+        ),
         decoration: BoxDecoration(
-          color: Colors.white70,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: AppRadius.smallAll,
         ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppSizes.padding / 4,
-            horizontal: AppSizes.padding / 2,
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
-            borderRadius: AppRadius.smallAll,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.remove_circle,
-                color: Theme.of(context).colorScheme.outline,
-                size: 10,
-              ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  'Out of stock',
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
-                  ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.remove_circle,
+              color: Theme.of(context).colorScheme.outline,
+              size: 10,
+            ),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                'Out of stock',
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

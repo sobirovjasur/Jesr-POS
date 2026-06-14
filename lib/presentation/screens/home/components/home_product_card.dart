@@ -1,11 +1,11 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/themes/app_radius.dart';
 import '../../../../core/themes/app_sizes.dart';
+import '../../../../core/utilities/currency_formatter.dart';
 import '../../../../domain/entities/product_entity.dart';
 import '../../../providers/home/home_notifier.dart';
 
@@ -16,11 +16,6 @@ class HomeProductCard extends ConsumerWidget {
   final ProductEntity product;
 
   const HomeProductCard({super.key, required this.product});
-
-  static final _numberFormat = NumberFormat('#,##0');
-
-  /// Groups thousands with spaces, e.g. `1400000` -> `1 400 000`.
-  static String _money(int value) => _numberFormat.format(value).replaceAll(',', ' ');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,14 +51,14 @@ class HomeProductCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AspectRatio(
-                aspectRatio: 1,
+              Expanded(
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
                     AppImage(
                       image: product.imageUrl,
                       borderRadius: AppRadius.cardAll,
-                      backgroundColor: colorScheme.surfaceContainerLow,
+                      backgroundColor: AppColors.imageBackground,
                       errorWidget: Icon(Icons.image, color: colorScheme.surfaceDim, size: 32),
                     ),
                     if (isOutOfStock) _OutOfStockOverlay(),
@@ -90,7 +85,7 @@ class HomeProductCard extends ConsumerWidget {
                   ],
                   Expanded(
                     child: Text(
-                      '$displayQty x ${_money(product.price)} UZS/шт',
+                      '$displayQty x ${CurrencyFormatter.format(product.price)}/шт',
                       overflow: TextOverflow.ellipsis,
                       style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),
@@ -99,7 +94,7 @@ class HomeProductCard extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                _money(product.price * displayQty),
+                CurrencyFormatter.withoutSymbol(product.price * displayQty),
                 style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],

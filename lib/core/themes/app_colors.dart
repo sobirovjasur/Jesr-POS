@@ -30,6 +30,9 @@ class AppColors {
   /// Subtle field/search/sheet background.
   static const Color surfaceSubtle = Color(0xFFF4F4F4);
 
+  /// Neutral background behind product/profile images (for transparent ones).
+  static const Color imageBackground = Color(0xFFF2F2F2);
+
   /// Alternate separator block surface.
   static const Color surfaceAlt = Color(0xFFEBEBEB);
 
