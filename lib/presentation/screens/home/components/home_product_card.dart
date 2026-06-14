@@ -57,6 +57,7 @@ class HomeProductCard extends ConsumerWidget {
                   children: [
                     AppImage(
                       image: product.imageUrl,
+                      fit: BoxFit.contain,
                       borderRadius: AppRadius.cardAll,
                       backgroundColor: AppColors.imageBackground,
                       errorWidget: Icon(Icons.image, color: colorScheme.surfaceDim, size: 32),
@@ -66,11 +67,14 @@ class HomeProductCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                product.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+              SizedBox(
+                height: 40,
+                child: Text(
+                  product.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
               ),
               const SizedBox(height: 6),
               Row(

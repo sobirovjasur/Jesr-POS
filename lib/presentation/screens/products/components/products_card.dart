@@ -49,6 +49,7 @@ class ProductsCard extends StatelessWidget {
                     children: [
                       AppImage(
                         image: product.imageUrl,
+                        fit: BoxFit.contain,
                         borderRadius: AppRadius.cardAll,
                         border: Border.all(width: 0.5, color: Theme.of(context).colorScheme.surfaceContainerHighest),
                         backgroundColor: AppColors.imageBackground,
@@ -63,11 +64,14 @@ class ProductsCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  product.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                SizedBox(
+                  height: 34,
+                  child: Text(
+                    product.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Row(

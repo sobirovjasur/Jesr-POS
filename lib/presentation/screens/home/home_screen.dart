@@ -251,7 +251,12 @@ class _ProductGrid extends ConsumerWidget {
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(AppSizes.padding, 2, AppSizes.padding, AppSizes.padding),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.padding,
+                  AppSizes.padding,
+                  AppSizes.padding,
+                  AppSizes.padding,
+                ),
                 sliver: SliverGrid.builder(
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 200,
