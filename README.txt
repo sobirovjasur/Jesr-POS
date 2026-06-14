@@ -2,65 +2,65 @@
 JESR MOBILE APP POS SYSTEM
 ==============================================================
 
-LOYIHA HAQIDA
--------------
-Jesr — Android uchun savdo nuqtasi (Point of Sale, POS) mobil ilovasi.
-Ilova mahsulotlarni boshqarish, savat va to'lov (kassa), cheklar,
-shtrix-kod skaneri, termal printerda chek chop etish hamda uch tilli
-interfeys (o'zbekcha / ruscha / inglizcha) imkoniyatlarini o'z ichiga
-oladi.
+ABOUT THE PROJECT
+-----------------
+Jesr is a point of sale (POS) mobile application for Android. It supports
+product management, a shopping cart and checkout, receipts, barcode
+scanning, thermal-printer receipt printing, and a trilingual interface
+(Uzbek / Russian / English).
 
-Ilova "offline-first" tamoyilida ishlaydi: barcha ma'lumotlar avval
-qurilmaning o'zida saqlanadi va internet mavjud bo'lganda bulutli bazaga
-avtomatik sinxronlanadi. Internet bo'lmaganda ham (yaratish, tahrirlash,
-o'chirish) amallari navbatga olinadi va aloqa tiklangach bajariladi.
+The app is offline-first: all data is stored locally on the device first
+and is automatically synchronized to the cloud database when an internet
+connection is available. While offline, user actions (create, update,
+delete) are queued and executed automatically once connectivity is
+restored.
 
 
-REPOZITORIYA (GITHUB)
----------------------
+REPOSITORY (GITHUB)
+-------------------
 https://github.com/sobirovjasur/Jesr-POS
 
 
-DASTURLASH TILI
----------------
+PROGRAMMING LANGUAGE
+--------------------
 - Dart (3.x)
 
 
-FRAMEWORK VA TEXNOLOGIYALAR
----------------------------
-- Flutter ............. asosiy UI framework (Android)
-- Riverpod ........... holatni boshqarish (state management)
-- GoRouter ........... navigatsiya / marshrutlash
-- Clean Architecture . qatlamli tuzilma (presentation / domain / data)
-- Material 3 ......... dizayn tizimi (binafsha aksent #9103E4, SF Pro Display)
-- Firebase ........... Authentication (telefon + parol), Firestore, Storage
-- mobile_scanner ..... shtrix-kod / QR skaner
-- unified_esc_pos_printer . termal printerda chek chop etish
-- image_picker / image_cropper . mahsulot rasmlari
-- share_plus ......... chekni ulashish
-- connectivity_plus .. internet holatini aniqlash
-- shared_preferences . sozlamalar (til tanlovi va h.k.)
+FRAMEWORK AND TECHNOLOGIES
+--------------------------
+- Flutter ..................... main UI framework (Android)
+- Riverpod ................... state management
+- GoRouter ................... navigation / routing
+- Clean Architecture ......... layered structure (presentation / domain / data)
+- Material 3 ................. design system (purple accent #9103E4, SF Pro Display)
+- Firebase ................... Authentication (phone + password), Firestore, Storage
+- mobile_scanner ............. barcode / QR scanning
+- unified_esc_pos_printer .... thermal-printer receipt printing
+- image_picker / image_cropper  product images
+- share_plus ................. receipt sharing
+- connectivity_plus .......... internet status detection
+- shared_preferences ......... settings (language selection, etc.)
 
 
-MA'LUMOTLAR BAZASI
-------------------
-- Mahalliy (local)  : SQLite (sqflite) — asosiy baza, offline ishlash uchun
-- Bulutli (cloud)   : Google Firebase Cloud Firestore — sinxronizatsiya uchun
-- Rasm fayllari     : Firebase Storage
+DATABASE
+--------
+- Local : SQLite (sqflite) — primary database, for offline operation
+- Cloud : Google Firebase Cloud Firestore — for synchronization
+- Files : Firebase Storage — for images
 
 
-ASOSIY IMKONIYATLAR
--------------------
-- Tizimga kirish va ro'yxatdan o'tish (telefon raqami + parol)
-- Bosh sahifa (POS): mahsulotni bosib savatga qo'shish, online/offline holati
-- Savat: tanlangan/qaytariladigan mahsulotlar, to'lov, "Otложить"
-- Cheklar: holatlar (Sotildi / Qaytarildi / Keyinga qoldirilgan), tafsilot, ulashish
-- Mahsulotlar: ro'yxat, qo'shish/tahrirlash, shtrix-kod skaneri
-- Profil: ma'lumotlarni tahrirlash, filial / kassa
-- Sozlamalar: printer, til (o'zbekcha/ruscha/inglizcha), ilova haqida
+KEY FEATURES
+------------
+- Sign in and registration (phone number + password)
+- Home (POS): tap a product to add it to the cart, online/offline status
+- Cart: selected vs. returned items, payment, postpone
+- Receipts: statuses (Sold / Returned / Postponed), details, sharing
+- Products: list, add/edit, barcode scanner
+- Profile: edit details, branch / cashbox
+- Settings: printer, language (Uzbek / Russian / English), about
 
 
-ISHGA TUSHIRISH
+GETTING STARTED
 ---------------
   flutter pub get
   flutter run --dart-define-from-file=config.json
