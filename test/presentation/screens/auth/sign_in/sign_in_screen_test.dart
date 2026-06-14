@@ -53,11 +53,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // assert
-      expect(find.text('Authorization'), findsOneWidget);
-      expect(find.text('Login'), findsOneWidget);
-      expect(find.text('Password'), findsOneWidget);
-      expect(find.text('Sign in'), findsOneWidget);
-      expect(find.text('Register'), findsOneWidget);
+      expect(find.text('Авторизация'), findsOneWidget);
+      expect(find.text('Логин'), findsOneWidget);
+      expect(find.text('Пароль'), findsOneWidget);
+      expect(find.text('Войти'), findsOneWidget);
+      expect(find.text('Регистрация'), findsOneWidget);
     });
 
     testWidgets('should display sign in button', (tester) async {
@@ -66,7 +66,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // assert
-      final button = find.text('Sign in');
+      final button = find.text('Войти');
       expect(button, findsOneWidget);
     });
   });

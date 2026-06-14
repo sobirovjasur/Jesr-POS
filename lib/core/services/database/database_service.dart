@@ -47,6 +47,20 @@ class DatabaseService {
       database.execute(DatabaseConfig.createOrderedProductTable),
       database.execute(DatabaseConfig.createQueuedActionTable),
     ]);
+
+    await _migrate();
+  }
+
+  /// Lightweight, version-less migrations for columns added after a table was
+  /// first created. Each ALTER is wrapped so a pre-existing column is ignored.
+  Future<void> _migrate() async {
+    try {
+      await database.execute(
+        "ALTER TABLE '${DatabaseConfig.transactionTableName}' ADD COLUMN 'status' TEXT DEFAULT 'sold'",
+      );
+    } catch (_) {
+      // Column already exists.
+    }
   }
 
   @visibleForTesting

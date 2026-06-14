@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS '$productTableName' (
 CREATE TABLE IF NOT EXISTS '$transactionTableName' (
     'id' INTEGER NOT NULL,
     'paymentMethod' TEXT,
+    'status' TEXT DEFAULT 'sold',
     'customerName' TEXT,
     'description' TEXT,
     'createdById' TEXT,
