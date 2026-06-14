@@ -9,22 +9,21 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/services/image/background_removal_service.dart';
+import '../../../core/themes/app_colors.dart';
+import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../providers/products/product_form_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
-import '../../widgets/app_icon_button.dart';
 import '../../widgets/app_progress_indicator.dart';
 import '../../widgets/app_snack_bar.dart';
 import '../../widgets/app_text_field.dart';
 
+/// Product create/edit form (Figma 13 — "Товары" / Create Product).
 class ProductFormScreen extends ConsumerStatefulWidget {
   final int? id;
 
-  const ProductFormScreen({
-    super.key,
-    this.id,
-  });
+  const ProductFormScreen({super.key, this.id});
 
   @override
   ConsumerState<ProductFormScreen> createState() => _ProductFormScreenState();
@@ -34,7 +33,11 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
   final stockController = TextEditingController();
+  final installmentController = TextEditingController();
+  final specsController = TextEditingController();
   final descController = TextEditingController();
+
+  bool get _isEdit => widget.id != null;
 
   @override
   void initState() {
@@ -46,6 +49,8 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       nameController.text = state.name ?? '';
       priceController.text = state.price?.toString() ?? '';
       stockController.text = state.stock?.toString() ?? '';
+      installmentController.text = state.installmentMonths?.toString() ?? '';
+      specsController.text = state.specifications ?? '';
       descController.text = state.description ?? '';
     });
   }
@@ -55,25 +60,20 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     nameController.dispose();
     priceController.dispose();
     stockController.dispose();
+    installmentController.dispose();
+    specsController.dispose();
     descController.dispose();
     super.dispose();
   }
 
   void onTapImage() async {
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 50,
-    );
-
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50);
     if (pickedFile == null) return;
 
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: pickedFile.path,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-      uiSettings: [
-        AndroidUiSettings(toolbarTitle: 'Crop Photo'),
-        IOSUiSettings(title: 'Crop Photo'),
-      ],
+      uiSettings: [AndroidUiSettings(toolbarTitle: 'Crop Photo'), IOSUiSettings(title: 'Crop Photo')],
     );
 
     if (croppedFile != null) {
@@ -95,7 +95,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     if (res.isSuccess) {
       if (!mounted) return;
       context.go('/products');
-      AppSnackBar.show('Product created');
+      AppSnackBar.show('Ваш продукт', message: 'Успешно добавлен в систему!');
     } else {
       AppDialog.showError(error: res.error?.toString());
     }
@@ -109,7 +109,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     if (res.isSuccess) {
       if (!mounted) return;
       context.pop();
-      AppSnackBar.show('Product updated');
+      AppSnackBar.show('Ваш продукт', message: 'Успешно обновлён!');
     } else {
       AppDialog.showError(error: res.error?.toString());
     }
@@ -123,292 +123,212 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     if (res.isSuccess) {
       if (!mounted) return;
       context.go('/products');
-      AppSnackBar.show('Product deleted');
+      AppSnackBar.showWarning('Товар удалён', message: 'Продукт удалён из системы');
     } else {
       AppDialog.showError(error: res.error?.toString());
     }
   }
 
+  void _confirmDelete() {
+    AppDialog.show(
+      title: 'Внимание',
+      text: 'Хотите удалить этот товар?',
+      leftButtonText: 'Нет',
+      rightButtonText: 'Да',
+      rightButtonColor: Theme.of(context).colorScheme.errorContainer,
+      rightButtonTextColor: Theme.of(context).colorScheme.error,
+      onTapRightButton: (context) {
+        context.pop();
+        deleteProduct();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final notifier = ref.read(productFormNotifierProvider.notifier);
+    final textTheme = Theme.of(context).textTheme;
 
     final isLoaded = ref.watch(productFormNotifierProvider.select((s) => s.isLoaded));
+    final isFormValid = ref.watch(
+      productFormNotifierProvider.select((s) => (s.name?.isNotEmpty ?? false) && (s.price ?? 0) > 0 && (s.stock ?? 0) > 0),
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.id == null ? 'Create Product' : 'Edit Product'),
-        titleSpacing: 0,
+        centerTitle: true,
+        title: Text(_isEdit ? 'Изменить товар' : 'Товары', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: !isLoaded
           ? const AppProgressIndicator()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSizes.padding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _ImageSection(onTapImage: onTapImage),
-                  _NameField(
-                    controller: nameController,
-                    onChanged: notifier.onChangedName,
+          : Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSizes.padding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Фото товара', style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: AppSizes.padding / 2),
+                        _PhotoPicker(onTap: onTapImage),
+                        const SizedBox(height: AppSizes.padding),
+                        AppTextField(
+                          controller: nameController,
+                          labelText: 'Название товара',
+                          hintText: 'Название вашего продукта',
+                          onChanged: notifier.onChangedName,
+                        ),
+                        const SizedBox(height: AppSizes.padding),
+                        AppTextField(
+                          controller: priceController,
+                          labelText: 'Цена',
+                          hintText: 'Цена товара',
+                          type: AppTextFieldType.currency,
+                          onChanged: notifier.onChangedPrice,
+                        ),
+                        const SizedBox(height: AppSizes.padding),
+                        AppTextField(
+                          controller: stockController,
+                          labelText: 'Кол-во / Шт',
+                          hintText: 'Количество',
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          onChanged: notifier.onChangedStock,
+                        ),
+                        const SizedBox(height: AppSizes.padding),
+                        AppTextField(
+                          controller: installmentController,
+                          labelText: 'В рассрочку',
+                          hintText: 'на 6 месяцев',
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          onChanged: notifier.onChangedInstallmentMonths,
+                        ),
+                        const SizedBox(height: AppSizes.padding),
+                        AppTextField(
+                          controller: specsController,
+                          labelText: 'Характеристики',
+                          hintText: 'Напишите',
+                          maxLines: 4,
+                          onChanged: notifier.onChangedSpecifications,
+                        ),
+                        const SizedBox(height: AppSizes.padding),
+                        AppTextField(
+                          controller: descController,
+                          labelText: 'Описание товара',
+                          hintText: 'Напишите',
+                          maxLines: 4,
+                          onChanged: notifier.onChangedDesc,
+                        ),
+                        if (_isEdit) ...[
+                          const SizedBox(height: AppSizes.padding),
+                          AppButton(
+                            text: 'Удалить товар',
+                            width: double.infinity,
+                            height: 50,
+                            textColor: Theme.of(context).colorScheme.error,
+                            buttonColor: Theme.of(context).colorScheme.surface,
+                            borderColor: Theme.of(context).colorScheme.error,
+                            onTap: _confirmDelete,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                  _PriceField(
-                    controller: priceController,
-                    onChanged: notifier.onChangedPrice,
+                ),
+                SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSizes.padding),
+                    child: AppButton(
+                      text: _isEdit ? 'Сохранить' : 'Добавить',
+                      width: double.infinity,
+                      height: 52,
+                      fontSize: 18,
+                      enabled: isFormValid,
+                      disabledButtonColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                      onTap: _isEdit ? updatedProduct : createProduct,
+                    ),
                   ),
-                  _StockField(
-                    controller: stockController,
-                    onChanged: notifier.onChangedStock,
-                  ),
-                  _DescriptionField(
-                    controller: descController,
-                    onChanged: notifier.onChangedDesc,
-                  ),
-                  _CreateOrUpdateButton(
-                    id: widget.id,
-                    onCreateProduct: createProduct,
-                    onUpdatedProduct: updatedProduct,
-                  ),
-                  _DeleteButton(
-                    id: widget.id,
-                    onDeleteProduct: deleteProduct,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
     );
   }
 }
 
-class _ImageSection extends ConsumerWidget {
-  final VoidCallback onTapImage;
+class _PhotoPicker extends ConsumerWidget {
+  final VoidCallback onTap;
 
-  const _ImageSection({required this.onTapImage});
+  const _PhotoPicker({required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final imageFile = ref.watch(productFormNotifierProvider.select((p) => p.imageFile));
     final imageUrl = ref.watch(productFormNotifierProvider.select((p) => p.imageUrl));
+    final hasImage = imageFile != null || (imageUrl?.isNotEmpty ?? false);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Product Image',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: AppSizes.padding / 2),
-        Stack(
-          children: [
-            GestureDetector(
-              onTap: onTapImage,
-              child: AppImage(
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 110,
+        height: 110,
+        child: hasImage
+            ? AppImage(
                 image: imageFile?.path ?? imageUrl ?? '',
                 imgProvider: imageFile != null ? ImgProvider.fileImage : ImgProvider.networkImage,
-                width: 100,
-                height: 100,
-                borderRadius: BorderRadius.circular(AppSizes.radius),
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                border: Border.all(
-                  width: 1,
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                ),
-                errorWidget: Icon(
-                  Icons.image,
-                  color: Theme.of(context).colorScheme.surfaceDim,
-                  size: 32,
+                width: 110,
+                height: 110,
+                fit: BoxFit.contain,
+                borderRadius: AppRadius.cardAll,
+                backgroundColor: AppColors.imageBackground,
+                errorWidget: Icon(Icons.image, color: Theme.of(context).colorScheme.surfaceDim, size: 32),
+              )
+            : CustomPaint(
+                painter: _DashedBorderPainter(color: AppColors.primary, radius: AppRadius.card),
+                child: const Center(
+                  child: Icon(Icons.add_rounded, color: AppColors.primary, size: 36),
                 ),
               ),
-            ),
-            Positioned(
-              right: 8,
-              bottom: 8,
-              child: AppIconButton(
-                icon: Icons.camera_alt_rounded,
-                iconSize: 14,
-                borderRadius: 8,
-                padding: const EdgeInsets.all(6),
-                onTap: onTapImage,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _NameField extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-
-  const _NameField({
-    required this.controller,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: controller,
-        labelText: 'Name',
-        hintText: 'Product name...',
-        onChanged: onChanged,
       ),
     );
   }
 }
 
-class _PriceField extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
+class _DashedBorderPainter extends CustomPainter {
+  final Color color;
+  final double radius;
 
-  const _PriceField({
-    required this.controller,
-    required this.onChanged,
-  });
+  _DashedBorderPainter({required this.color, required this.radius});
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: controller,
-        labelText: 'Price',
-        hintText: 'Product price...',
-        type: AppTextFieldType.currency,
-        onChanged: onChanged,
-      ),
-    );
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final rrect = RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius));
+    final path = Path()..addRRect(rrect);
+
+    const dash = 6.0;
+    const gap = 4.0;
+
+    for (final metric in path.computeMetrics()) {
+      double dist = 0;
+      while (dist < metric.length) {
+        final next = dist + dash;
+        canvas.drawPath(metric.extractPath(dist, next.clamp(0, metric.length)), paint);
+        dist = next + gap;
+      }
+    }
   }
-}
-
-class _StockField extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-
-  const _StockField({
-    required this.controller,
-    required this.onChanged,
-  });
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: controller,
-        labelText: 'Stock',
-        hintText: 'Product stock...',
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: onChanged,
-      ),
-    );
-  }
-}
-
-class _DescriptionField extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-
-  const _DescriptionField({
-    required this.controller,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: AppTextField(
-        controller: controller,
-        labelText: 'Description',
-        hintText: 'Product description...',
-        maxLines: 4,
-        onChanged: onChanged,
-      ),
-    );
-  }
-}
-
-class _CreateOrUpdateButton extends ConsumerWidget {
-  final int? id;
-  final VoidCallback onCreateProduct;
-  final VoidCallback onUpdatedProduct;
-
-  const _CreateOrUpdateButton({
-    required this.id,
-    required this.onCreateProduct,
-    required this.onUpdatedProduct,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isFormValid = ref.watch(
-      productFormNotifierProvider.select((s) {
-        return (s.name?.isNotEmpty ?? false) && (s.price ?? 0) > 0 && (s.stock ?? 0) > 0;
-      }),
-    );
-
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding * 1.5),
-      child: AppButton(
-        text: id == null ? 'Add Product' : 'Update Product',
-        enabled: isFormValid,
-        onTap: () {
-          if (id != null) {
-            onUpdatedProduct();
-          } else {
-            onCreateProduct();
-          }
-        },
-      ),
-    );
-  }
-}
-
-class _DeleteButton extends StatelessWidget {
-  final int? id;
-  final VoidCallback onDeleteProduct;
-
-  const _DeleteButton({
-    required this.id,
-    required this.onDeleteProduct,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (id == null) return const SizedBox(height: AppSizes.padding * 2);
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: AppSizes.padding,
-        bottom: AppSizes.padding * 2,
-      ),
-      child: AppButton(
-        text: 'Delete',
-        textColor: Theme.of(context).colorScheme.error,
-        buttonColor: Theme.of(context).colorScheme.surfaceContainerLowest,
-        onTap: () {
-          AppDialog.show(
-            title: 'Confirm',
-            text: 'Are you sure want to delete this product?',
-            leftButtonText: 'Cancel',
-            rightButtonText: 'Delete',
-            rightButtonColor: Theme.of(context).colorScheme.errorContainer,
-            rightButtonTextColor: Theme.of(context).colorScheme.error,
-            onTapRightButton: (context) async {
-              context.pop();
-              onDeleteProduct();
-            },
-          );
-        },
-      ),
-    );
-  }
+  bool shouldRepaint(covariant _DashedBorderPainter old) => old.color != color || old.radius != radius;
 }

@@ -46,10 +46,12 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
         price: product?.price,
         stock: product?.stock,
         description: product?.description,
+        specifications: product?.specifications,
+        installmentMonths: product?.installmentMonths,
         isLoaded: true,
       );
     } else {
-      throw res.error ?? 'Failed to load data';
+      throw Exception(res.error?.toString() ?? 'Failed to load data');
     }
   }
 
@@ -75,6 +77,8 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
         stock: state.stock ?? 0,
         price: state.price ?? 0,
         description: state.description ?? '',
+        specifications: state.specifications,
+        installmentMonths: state.installmentMonths,
       );
 
       var res = await CreateProductUsecase(productRepository).call(product);
@@ -111,6 +115,8 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
         stock: state.stock ?? 0,
         price: state.price ?? 0,
         description: state.description ?? '',
+        specifications: state.specifications,
+        installmentMonths: state.installmentMonths,
       );
 
       var res = await UpdateProductUsecase(productRepository).call(product);
@@ -156,5 +162,13 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
 
   void onChangedDesc(String value) {
     state = state.copyWith(description: value);
+  }
+
+  void onChangedSpecifications(String value) {
+    state = state.copyWith(specifications: value);
+  }
+
+  void onChangedInstallmentMonths(String value) {
+    state = state.copyWith(installmentMonths: int.tryParse(value));
   }
 }

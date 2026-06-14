@@ -3,72 +3,92 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../core/utilities/currency_formatter.dart';
 import '../../../core/utilities/date_time_formatter.dart';
+import '../../../domain/entities/product_entity.dart';
 import '../../providers/products/product_detail_notifier.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_progress_indicator.dart';
 
-class ProductDetailScreen extends ConsumerWidget {
+/// Product detail (Figma 15 — "Детали товара").
+class ProductDetailScreen extends ConsumerStatefulWidget {
   final int id;
 
-  const ProductDetailScreen({
-    super.key,
-    required this.id,
-  });
+  const ProductDetailScreen({super.key, required this.id});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
+  late final Future<ProductEntity?> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = ref.read(productDetailNotifierProvider.notifier).getProductDetail(widget.id);
+  }
+
+  void _onBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/products');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product Detail'),
-        titleSpacing: 0,
-        actions: [_EditButton(id: id)],
+        centerTitle: true,
+        title: Text('Детали товара', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: _onBack,
+        ),
       ),
-      body: FutureBuilder(
-        future: ref.read(productDetailNotifierProvider.notifier).getProductDetail(id),
+      body: FutureBuilder<ProductEntity?>(
+        future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AppProgressIndicator();
           }
 
-          if (snapshot.hasError) {
-            throw snapshot.error.toString();
-          }
-
-          if (snapshot.data == null) {
-            return const AppEmptyState(title: 'Not Found');
+          if (snapshot.hasError || snapshot.data == null) {
+            return const AppEmptyState(title: 'Товар не найден');
           }
 
           final product = snapshot.data!;
 
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ProductImage(imageUrl: product.imageUrl),
-                Padding(
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(AppSizes.padding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ProductName(
-                        productName: product.name,
-                        createdAt: product.createdAt,
-                        updatedAt: product.updatedAt,
-                      ),
-                      _ProductPrice(price: product.price),
-                      _ProductStock(stock: product.stock),
-                      _ProductSold(sold: product.sold),
-                      _ProductDescription(description: product.description),
-                    ],
+                  child: _DetailBody(product: product),
+                ),
+              ),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSizes.padding),
+                  child: AppButton(
+                    text: 'Изменить товар',
+                    width: double.infinity,
+                    height: 52,
+                    fontSize: 18,
+                    onTap: () => context.push('/products/product-edit/${product.id}'),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -76,226 +96,195 @@ class ProductDetailScreen extends ConsumerWidget {
   }
 }
 
-class _EditButton extends StatelessWidget {
-  final int id;
+class _DetailBody extends StatelessWidget {
+  final ProductEntity product;
 
-  const _EditButton({required this.id});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppSizes.padding),
-      child: AppButton(
-        height: 26,
-        borderRadius: AppRadius.smallAll,
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 2),
-        buttonColor: Theme.of(context).colorScheme.surfaceContainer,
-        child: Row(
-          children: [
-            Icon(
-              Icons.edit_note_rounded,
-              size: 12,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(width: AppSizes.padding / 4),
-            Text(
-              'Edit Product',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ],
-        ),
-        onTap: () {
-          context.push('/products/product-edit/$id');
-        },
-      ),
-    );
-  }
-}
-
-class _ProductImage extends StatelessWidget {
-  final String? imageUrl;
-
-  const _ProductImage({required this.imageUrl});
+  const _DetailBody({required this.product});
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: AppSizes.screenWidth(context),
-        minHeight: AppSizes.screenHeight(context) / 3,
-        maxHeight: AppSizes.screenHeight(context) / 3,
-      ),
-      child: AppImage(
-        image: imageUrl ?? '',
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        border: Border.all(
-          width: 0.5,
-          color: Theme.of(context).colorScheme.primaryContainer,
-        ),
-        enableFullScreenView: true,
-        errorWidget: Icon(
-          Icons.image,
-          color: Theme.of(context).colorScheme.surfaceDim,
-          size: 32,
-        ),
-      ),
-    );
-  }
-}
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
-class _ProductName extends StatelessWidget {
-  final String? productName;
-  final String? createdAt;
-  final String? updatedAt;
-
-  const _ProductName({
-    required this.productName,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  @override
-  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Product image on a neutral card.
+        AppImage(
+          image: product.imageUrl,
+          width: double.infinity,
+          height: 280,
+          fit: BoxFit.contain,
+          borderRadius: AppRadius.cardAll,
+          backgroundColor: AppColors.imageBackground,
+          errorWidget: Icon(Icons.image, color: colorScheme.surfaceDim, size: 40),
+        ),
+        const SizedBox(height: AppSizes.padding),
         Text(
-          productName ?? '(No name)',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          product.name,
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: AppSizes.padding / 3),
+        Text(
+          CurrencyFormatter.format(product.price),
+          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
+        ),
+        const SizedBox(height: AppSizes.padding * 1.5),
+        Text('Информация о товаре', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: AppSizes.padding),
+        Row(
+          children: [
+            _InfoChip(label: 'Остаток', value: '${product.stock}'),
+            const SizedBox(width: AppSizes.padding / 2),
+            _InfoChip(label: 'Продано', value: '${product.sold ?? 0}'),
+          ],
         ),
         const SizedBox(height: AppSizes.padding / 2),
-        Text(
-          "Added at ${DateTimeFormatter.stripDateWithClock(createdAt ?? '')}",
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontSize: 10,
-            color: Theme.of(context).colorScheme.outline,
-          ),
+        _InfoChip(label: 'Добавлено', value: DateTimeFormatter.dotDateWithSlashClock(product.createdAt ?? '')),
+        const SizedBox(height: AppSizes.padding / 2),
+        _InfoChip(
+          label: 'Последнее обновление',
+          value: DateTimeFormatter.dotDateWithSlashClock(product.updatedAt ?? ''),
         ),
-        Text(
-          "Last updated at ${DateTimeFormatter.stripDateWithClock(updatedAt ?? '')}",
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontSize: 10,
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
+        const SizedBox(height: AppSizes.padding * 1.5),
+        _DescriptionTabs(product: product),
       ],
     );
   }
 }
 
-class _ProductPrice extends StatelessWidget {
-  final int? price;
+class _InfoChip extends StatelessWidget {
+  final String label;
+  final String value;
 
-  const _ProductPrice({required this.price});
+  const _InfoChip({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Price",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          Text(
-            CurrencyFormatter.format(price ?? 0),
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSubtle,
+        borderRadius: BorderRadius.circular(AppRadius.small),
+      ),
+      child: RichText(
+        text: TextSpan(
+          style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+          children: [
+            TextSpan(text: '$label: '),
+            TextSpan(
+              text: value,
+              style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _ProductStock extends StatelessWidget {
-  final int? stock;
+class _DescriptionTabs extends StatefulWidget {
+  final ProductEntity product;
 
-  const _ProductStock({required this.stock});
+  const _DescriptionTabs({required this.product});
+
+  @override
+  State<_DescriptionTabs> createState() => _DescriptionTabsState();
+}
+
+class _DescriptionTabsState extends State<_DescriptionTabs> {
+  int _tab = 0; // 0 = Описание, 1 = Характеристики
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Stock",
-            style: Theme.of(context).textTheme.bodyMedium,
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final isDescription = _tab == 0;
+    final content = isDescription ? widget.product.description : widget.product.specifications;
+    final text = content?.isNotEmpty == true
+        ? content!
+        : (isDescription ? 'Нет описания' : 'Нет характеристик');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSubtle,
+            borderRadius: AppRadius.cardAll,
           ),
-          Text(
-            "$stock",
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          child: Row(
+            children: [
+              _TabButton(label: 'Описание', selected: isDescription, onTap: () => setState(() => _tab = 0)),
+              _TabButton(label: 'Характеристики', selected: !isDescription, onTap: () => setState(() => _tab = 1)),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSizes.padding),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 150),
+          alignment: Alignment.topCenter,
+          child: Text(
+            text,
+            maxLines: _expanded ? null : 4,
+            overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant, height: 1.4),
+          ),
+        ),
+        if (text.length > 140)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSizes.padding / 2),
+            child: GestureDetector(
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Text(
+                _expanded ? 'Скрыть' : 'Показать ещё',
+                style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
+              ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
 
-class _ProductSold extends StatelessWidget {
-  final int? sold;
+class _TabButton extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
-  const _ProductSold({required this.sold});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Sold",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          Text(
-            "$sold",
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProductDescription extends StatelessWidget {
-  final String? description;
-
-  const _ProductDescription({required this.description});
+  const _TabButton({required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.padding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Description",
-            style: Theme.of(context).textTheme.bodyMedium,
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? colorScheme.surface : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadius.small + 4),
           ),
-          Text(
-            description ?? '(No description)',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          child: Text(
+            label,
+            style: textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: selected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
             ),
           ),
-        ],
+        ),
       ),
     );
   }

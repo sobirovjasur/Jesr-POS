@@ -9,6 +9,8 @@ class ProductModel {
   int sold;
   int price;
   String? description;
+  String? specifications;
+  int? installmentMonths;
   String? createdAt;
   String? updatedAt;
 
@@ -21,6 +23,8 @@ class ProductModel {
     required this.sold,
     required this.price,
     this.description,
+    this.specifications,
+    this.installmentMonths,
     this.createdAt,
     this.updatedAt,
   });
@@ -35,6 +39,8 @@ class ProductModel {
       sold: json['sold'],
       price: json['price'],
       description: json['description'],
+      specifications: json['specifications'],
+      installmentMonths: json['installmentMonths'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -50,6 +56,8 @@ class ProductModel {
       'sold': sold,
       'price': price,
       'description': description,
+      'specifications': specifications,
+      'installmentMonths': installmentMonths,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -65,6 +73,8 @@ class ProductModel {
       sold: entity.sold ?? 0,
       price: entity.price,
       description: entity.description,
+      specifications: entity.specifications,
+      installmentMonths: entity.installmentMonths,
       createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
       updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
@@ -80,6 +90,8 @@ class ProductModel {
       sold: sold,
       price: price,
       description: description,
+      specifications: specifications,
+      installmentMonths: installmentMonths,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

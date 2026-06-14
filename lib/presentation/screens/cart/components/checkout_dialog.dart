@@ -82,7 +82,11 @@ class _CheckoutDialogBodyState extends ConsumerState<_CheckoutDialogBody> {
           controller: _amountController,
           labelText: 'Полученная сумма',
           hintText: 'Введите сумму',
-          onChanged: (v) => homeNotifier.onChangedReceivedAmount(int.tryParse(v) ?? 0),
+          onChanged: (v) {
+            homeNotifier.onChangedReceivedAmount(int.tryParse(v) ?? 0);
+            // Rebuild so the "Оплатить" button re-evaluates its enabled state.
+            setState(() {});
+          },
         ),
         const SizedBox(height: AppSizes.padding),
         Align(

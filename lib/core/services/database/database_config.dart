@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS '$productTableName' (
     'sold' INTEGER,
     'price' INTEGER,
     'description' TEXT,
+    'specifications' TEXT,
+    'installmentMonths' INTEGER,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ('id'),

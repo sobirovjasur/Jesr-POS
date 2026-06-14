@@ -7,6 +7,8 @@ class ProductFormState {
   final int? price;
   final int? stock;
   final String? description;
+  final String? specifications;
+  final int? installmentMonths;
   final bool isLoaded;
 
   const ProductFormState({
@@ -16,6 +18,8 @@ class ProductFormState {
     this.price,
     this.stock,
     this.description,
+    this.specifications,
+    this.installmentMonths,
     this.isLoaded = false,
   });
 
@@ -26,6 +30,8 @@ class ProductFormState {
     int? price,
     int? stock,
     String? description,
+    String? specifications,
+    int? installmentMonths,
     bool? isLoaded,
   }) {
     return ProductFormState(
@@ -35,6 +41,8 @@ class ProductFormState {
       price: price ?? this.price,
       stock: stock ?? this.stock,
       description: description ?? this.description,
+      specifications: specifications ?? this.specifications,
+      installmentMonths: installmentMonths ?? this.installmentMonths,
       isLoaded: isLoaded ?? this.isLoaded,
     );
   }

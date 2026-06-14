@@ -54,12 +54,18 @@ class DatabaseService {
   /// Lightweight, version-less migrations for columns added after a table was
   /// first created. Each ALTER is wrapped so a pre-existing column is ignored.
   Future<void> _migrate() async {
-    try {
-      await database.execute(
-        "ALTER TABLE '${DatabaseConfig.transactionTableName}' ADD COLUMN 'status' TEXT DEFAULT 'sold'",
-      );
-    } catch (_) {
-      // Column already exists.
+    const alters = [
+      "ALTER TABLE '${DatabaseConfig.transactionTableName}' ADD COLUMN 'status' TEXT DEFAULT 'sold'",
+      "ALTER TABLE '${DatabaseConfig.productTableName}' ADD COLUMN 'specifications' TEXT",
+      "ALTER TABLE '${DatabaseConfig.productTableName}' ADD COLUMN 'installmentMonths' INTEGER",
+    ];
+
+    for (final sql in alters) {
+      try {
+        await database.execute(sql);
+      } catch (_) {
+        // Column already exists.
+      }
     }
   }
 
