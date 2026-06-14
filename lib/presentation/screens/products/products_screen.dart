@@ -150,7 +150,10 @@ class _SearchBar extends StatelessWidget {
             },
           ),
           const SizedBox(width: AppSizes.padding / 2),
-          Icon(Icons.qr_code_scanner_rounded, color: colorScheme.onSurfaceVariant, size: 22),
+          GestureDetector(
+            onTap: () => context.push('/products/scan'),
+            child: Icon(Icons.qr_code_scanner_rounded, color: colorScheme.primary, size: 22),
+          ),
         ],
       ),
     );

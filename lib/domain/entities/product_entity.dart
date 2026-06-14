@@ -11,6 +11,7 @@ class ProductEntity extends Equatable {
   final String? description;
   final String? specifications;
   final int? installmentMonths;
+  final String? barcode;
   final String? createdAt;
   final String? updatedAt;
 
@@ -25,6 +26,7 @@ class ProductEntity extends Equatable {
     this.description,
     this.specifications,
     this.installmentMonths,
+    this.barcode,
     this.createdAt,
     this.updatedAt,
   });
@@ -40,6 +42,7 @@ class ProductEntity extends Equatable {
     String? description,
     String? specifications,
     int? installmentMonths,
+    String? barcode,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -54,6 +57,7 @@ class ProductEntity extends Equatable {
       description: description ?? this.description,
       specifications: specifications ?? this.specifications,
       installmentMonths: installmentMonths ?? this.installmentMonths,
+      barcode: barcode ?? this.barcode,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -71,6 +75,7 @@ class ProductEntity extends Equatable {
     description,
     specifications,
     installmentMonths,
+    barcode,
     createdAt,
     updatedAt,
   ];

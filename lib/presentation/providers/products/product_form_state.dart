@@ -9,6 +9,7 @@ class ProductFormState {
   final String? description;
   final String? specifications;
   final int? installmentMonths;
+  final String? barcode;
   final bool isLoaded;
 
   const ProductFormState({
@@ -20,6 +21,7 @@ class ProductFormState {
     this.description,
     this.specifications,
     this.installmentMonths,
+    this.barcode,
     this.isLoaded = false,
   });
 
@@ -32,6 +34,7 @@ class ProductFormState {
     String? description,
     String? specifications,
     int? installmentMonths,
+    String? barcode,
     bool? isLoaded,
   }) {
     return ProductFormState(
@@ -43,6 +46,7 @@ class ProductFormState {
       description: description ?? this.description,
       specifications: specifications ?? this.specifications,
       installmentMonths: installmentMonths ?? this.installmentMonths,
+      barcode: barcode ?? this.barcode,
       isLoaded: isLoaded ?? this.isLoaded,
     );
   }

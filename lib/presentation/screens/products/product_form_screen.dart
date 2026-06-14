@@ -23,7 +23,11 @@ import '../../widgets/app_text_field.dart';
 class ProductFormScreen extends ConsumerStatefulWidget {
   final int? id;
 
-  const ProductFormScreen({super.key, this.id});
+  /// Barcode captured by the scanner when adding a new product. Stored on the
+  /// product so a future scan of the same code finds it in Товары.
+  final String? barcode;
+
+  const ProductFormScreen({super.key, this.id, this.barcode});
 
   @override
   ConsumerState<ProductFormScreen> createState() => _ProductFormScreenState();
@@ -43,7 +47,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref.read(productFormNotifierProvider.notifier).initProductForm(widget.id);
+      final notifier = ref.read(productFormNotifierProvider.notifier);
+      await notifier.initProductForm(widget.id);
+
+      // Carry a scanned barcode into the new product (stored silently).
+      if (widget.barcode != null && widget.barcode!.isNotEmpty) {
+        notifier.onChangedBarcode(widget.barcode!);
+      }
 
       final state = ref.read(productFormNotifierProvider);
       nameController.text = state.name ?? '';

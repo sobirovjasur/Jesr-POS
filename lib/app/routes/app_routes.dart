@@ -17,6 +17,7 @@ import '../../presentation/screens/main/main_screen.dart';
 import '../../presentation/screens/products/product_detail_screen.dart';
 import '../../presentation/screens/products/product_form_screen.dart';
 import '../../presentation/screens/products/products_screen.dart';
+import '../../presentation/screens/products/scan_screen.dart';
 import '../../presentation/screens/soon/soon_screen.dart';
 import '../../presentation/screens/transactions/transaction_detail_screen.dart';
 import '../../presentation/screens/transactions/transactions_screen.dart';
@@ -193,7 +194,25 @@ class AppRoutes {
         _productCreate(),
         _productEdit(),
         _productDetail(),
+        _scan(),
+        _scanCamera(),
       ],
+    );
+  }
+
+  GoRoute _scan() {
+    return GoRoute(
+      path: 'scan',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const ScanAddScreen(),
+    );
+  }
+
+  GoRoute _scanCamera() {
+    return GoRoute(
+      path: 'scan-camera',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const ScanCameraScreen(),
     );
   }
 
@@ -232,7 +251,7 @@ class AppRoutes {
       path: 'product-create',
       parentNavigatorKey: navNavigatorKey,
       builder: (context, state) {
-        return const ProductFormScreen();
+        return ProductFormScreen(barcode: state.uri.queryParameters['barcode']);
       },
     );
   }

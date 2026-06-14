@@ -70,6 +70,7 @@ dependencies:
   permission_handler: ^12.0.1
   unified_esc_pos_printer: ^3.0.0
   share_plus: ^12.0.2
+  mobile_scanner: ^7.2.0
 
 dev_dependencies:
   flutter_test:

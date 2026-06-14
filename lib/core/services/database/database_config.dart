@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS '$productTableName' (
     'description' TEXT,
     'specifications' TEXT,
     'installmentMonths' INTEGER,
+    'barcode' TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ('id'),

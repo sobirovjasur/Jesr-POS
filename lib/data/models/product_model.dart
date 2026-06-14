@@ -11,6 +11,7 @@ class ProductModel {
   String? description;
   String? specifications;
   int? installmentMonths;
+  String? barcode;
   String? createdAt;
   String? updatedAt;
 
@@ -25,6 +26,7 @@ class ProductModel {
     this.description,
     this.specifications,
     this.installmentMonths,
+    this.barcode,
     this.createdAt,
     this.updatedAt,
   });
@@ -41,6 +43,7 @@ class ProductModel {
       description: json['description'],
       specifications: json['specifications'],
       installmentMonths: json['installmentMonths'],
+      barcode: json['barcode'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -58,6 +61,7 @@ class ProductModel {
       'description': description,
       'specifications': specifications,
       'installmentMonths': installmentMonths,
+      'barcode': barcode,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -75,6 +79,7 @@ class ProductModel {
       description: entity.description,
       specifications: entity.specifications,
       installmentMonths: entity.installmentMonths,
+      barcode: entity.barcode,
       createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
       updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
     );
@@ -92,6 +97,7 @@ class ProductModel {
       description: description,
       specifications: specifications,
       installmentMonths: installmentMonths,
+      barcode: barcode,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

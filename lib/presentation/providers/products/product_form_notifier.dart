@@ -48,6 +48,7 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
         description: product?.description,
         specifications: product?.specifications,
         installmentMonths: product?.installmentMonths,
+        barcode: product?.barcode,
         isLoaded: true,
       );
     } else {
@@ -79,6 +80,7 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
         description: state.description ?? '',
         specifications: state.specifications,
         installmentMonths: state.installmentMonths,
+        barcode: state.barcode,
       );
 
       var res = await CreateProductUsecase(productRepository).call(product);
@@ -117,6 +119,7 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
         description: state.description ?? '',
         specifications: state.specifications,
         installmentMonths: state.installmentMonths,
+        barcode: state.barcode,
       );
 
       var res = await UpdateProductUsecase(productRepository).call(product);
@@ -170,5 +173,9 @@ class ProductFormNotifier extends AutoDisposeNotifier<ProductFormState> {
 
   void onChangedInstallmentMonths(String value) {
     state = state.copyWith(installmentMonths: int.tryParse(value));
+  }
+
+  void onChangedBarcode(String value) {
+    state = state.copyWith(barcode: value);
   }
 }
