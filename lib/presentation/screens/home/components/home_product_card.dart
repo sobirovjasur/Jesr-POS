@@ -35,7 +35,7 @@ class HomeProductCard extends ConsumerWidget {
 
     return RepaintBoundary(
       child: InkWell(
-        onTap: isOutOfStock ? null : () => _addOne(ref, quantity),
+        onTap: isOutOfStock ? null : () => _toggle(ref, isSelected),
         splashColor: Colors.black.withValues(alpha: 0.06),
         borderRadius: AppRadius.cardAll,
         child: Ink(
@@ -108,9 +108,15 @@ class HomeProductCard extends ConsumerWidget {
     );
   }
 
-  void _addOne(WidgetRef ref, int currentQty) {
-    final next = currentQty + 1 <= product.stock ? currentQty + 1 : product.stock;
-    ref.read(homeNotifierProvider.notifier).onAddOrderedProduct(product, next == 0 ? 1 : next);
+  /// First tap adds one unit; tapping a selected card again removes it,
+  /// returning the card to its default (unselected) state.
+  void _toggle(WidgetRef ref, bool isSelected) {
+    final notifier = ref.read(homeNotifierProvider.notifier);
+    if (isSelected) {
+      notifier.removeOrderedProductByProductId(product.id!);
+    } else {
+      notifier.onAddOrderedProduct(product, 1);
+    }
   }
 }
 

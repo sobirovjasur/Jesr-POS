@@ -145,25 +145,96 @@ class _ScanCameraScreenState extends ConsumerState<ScanCameraScreen> {
       body: Stack(
         alignment: Alignment.center,
         children: [
-          Positioned.fill(child: MobileScanner(controller: _controller, onDetect: _onDetect)),
-          // Scan window guide.
-          Container(
-            width: 240,
-            height: 240,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 3),
-              borderRadius: AppRadius.sheetLargeAll,
+          Positioned.fill(
+            child: MobileScanner(
+              controller: _controller,
+              onDetect: _onDetect,
+              errorBuilder: (context, error) => _CameraError(message: error.errorDetails?.message),
+            ),
+          ),
+          // Dark scrim with a centered, rounded clear window.
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _ScannerOverlayPainter(
+                windowSize: 240,
+                radius: AppRadius.sheetLarge,
+                scrimColor: Colors.black.withValues(alpha: 0.4),
+              ),
             ),
           ),
           Positioned(
             bottom: 80,
-            child: Text(
-              'Просканируйте штрих-код',
-              style: textTheme.bodyMedium?.copyWith(color: Colors.white),
-            ),
+            child: Text('Просканируйте штрих-код', style: textTheme.bodyMedium?.copyWith(color: Colors.white)),
           ),
         ],
       ),
     );
   }
+}
+
+class _CameraError extends StatelessWidget {
+  final String? message;
+
+  const _CameraError({this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSizes.padding * 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.no_photography_outlined, color: Colors.white70, size: 56),
+            const SizedBox(height: AppSizes.padding),
+            Text(
+              'Камера недоступна',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: AppSizes.padding / 2),
+            Text(
+              message ?? 'Разрешите доступ к камере в настройках, затем попробуйте снова.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ScannerOverlayPainter extends CustomPainter {
+  final double windowSize;
+  final double radius;
+  final Color scrimColor;
+
+  _ScannerOverlayPainter({required this.windowSize, required this.radius, required this.scrimColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final window = Rect.fromCenter(center: rect.center, width: windowSize, height: windowSize);
+    final windowRRect = RRect.fromRectAndRadius(window, Radius.circular(radius));
+
+    final overlay = Path.combine(
+      PathOperation.difference,
+      Path()..addRect(rect),
+      Path()..addRRect(windowRRect),
+    );
+
+    canvas.drawPath(overlay, Paint()..color = scrimColor);
+    canvas.drawRRect(
+      windowRRect,
+      Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _ScannerOverlayPainter oldDelegate) =>
+      oldDelegate.windowSize != windowSize || oldDelegate.scrimColor != scrimColor || oldDelegate.radius != radius;
 }

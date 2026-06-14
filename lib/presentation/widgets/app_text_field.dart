@@ -143,7 +143,7 @@ class _AppTextFieldState extends State<AppTextField> {
             enabled: widget.enabled,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: widget.fontSize,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.normal,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             cursorColor: Theme.of(context).colorScheme.primary,

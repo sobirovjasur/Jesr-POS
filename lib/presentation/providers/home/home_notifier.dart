@@ -181,6 +181,15 @@ class HomeNotifier extends Notifier<HomeState> {
     );
   }
 
+  /// Remove a product from the cart by its id (used by the Home grid toggle).
+  void removeOrderedProductByProductId(int productId) {
+    final ids = {...state.unselectedProductIds}..remove(productId);
+    state = state.copyWith(
+      orderedProducts: state.orderedProducts.where((e) => e.productId != productId).toList(),
+      unselectedProductIds: ids,
+    );
+  }
+
   void onRemoveAllOrderedProduct() {
     state = const HomeState();
   }

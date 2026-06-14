@@ -56,16 +56,16 @@ class AccountScreen extends ConsumerWidget {
       _MenuItem(icon: Icons.currency_exchange_rounded, label: 'Обмен валюты', enabled: false),
       _MenuItem(icon: Icons.payments_outlined, label: 'Затраты', enabled: false),
       _MenuItem(icon: Icons.sell_outlined, label: 'Цены', enabled: false),
+      _MenuItem(icon: Icons.notifications_none_rounded, label: 'Уведомления', enabled: false),
     ];
 
     final mainItems = <_MenuItem>[
-      _MenuItem(icon: Icons.notifications_none_rounded, label: 'Уведомления', badge: true, onTap: () => context.push('/soon')),
       _MenuItem(
         icon: Icons.print_outlined,
         label: 'Настройки принтера',
         onTap: () => context.push('/account/printer-settings'),
       ),
-      _MenuItem(icon: Icons.palette_outlined, label: 'Оформления', onTap: () => context.push('/soon')),
+      _MenuItem(icon: Icons.palette_outlined, label: 'Оформления', onTap: () => context.push('/account/appearance')),
       _MenuItem(icon: Icons.info_outline_rounded, label: 'О приложении', onTap: () => context.push('/account/about')),
     ];
 

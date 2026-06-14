@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../providers/home/home_notifier.dart';
@@ -124,33 +125,43 @@ class _Header extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          AppImage(
-            image: user?.imageUrl ?? '',
-            width: 44,
-            height: 44,
-            borderRadius: BorderRadius.circular(AppRadius.pill),
-            backgroundColor: colorScheme.surfaceContainerLow,
-            errorWidget: Icon(Icons.person, color: colorScheme.outline, size: 24),
-          ),
-          const SizedBox(width: AppSizes.padding / 1.5),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  user?.name ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  _formatPhone(user?.phone),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-                ),
-              ],
+            child: InkWell(
+              borderRadius: AppRadius.pillAll,
+              onTap: () => context.go('/account'),
+              child: Row(
+                children: [
+                  AppImage(
+                    image: user?.imageUrl ?? '',
+                    width: 44,
+                    height: 44,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    backgroundColor: colorScheme.surfaceContainerLow,
+                    errorWidget: Icon(Icons.person, color: colorScheme.outline, size: 24),
+                  ),
+                  const SizedBox(width: AppSizes.padding / 1.5),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          user?.name ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          _formatPhone(user?.phone),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(width: AppSizes.padding / 2),
@@ -161,19 +172,24 @@ class _Header extends ConsumerWidget {
   }
 }
 
+/// Online/offline status indicator. Tapping while online triggers a sync.
 class _SyncChip extends ConsumerWidget {
   const _SyncChip();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isSyncronizing = ref.watch(mainNotifierProvider.select((p) => p.isSyncronizing));
-    final colorScheme = Theme.of(context).colorScheme;
+    final isOnline = ref.watch(mainNotifierProvider.select((p) => p.isHasInternet));
+
+    final color = isOnline ? AppColors.success : AppColors.textTertiary;
+    final label = isOnline ? 'Онлайн' : 'Офлайн';
+    final icon = isOnline ? Icons.cloud_done_rounded : Icons.cloud_off_rounded;
 
     return Material(
-      color: colorScheme.primaryContainer,
+      color: color.withValues(alpha: 0.12),
       borderRadius: AppRadius.pillAll,
       child: InkWell(
-        onTap: () => ref.read(mainNotifierProvider.notifier).checkAndSyncAllData(),
+        onTap: isOnline ? () => ref.read(mainNotifierProvider.notifier).checkAndSyncAllData() : null,
         borderRadius: AppRadius.pillAll,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 1.5, vertical: AppSizes.padding / 2.5),
@@ -184,16 +200,13 @@ class _SyncChip extends ConsumerWidget {
                 width: 14,
                 height: 14,
                 child: isSyncronizing
-                    ? CircularProgressIndicator(strokeWidth: 2, color: colorScheme.primary)
-                    : Icon(Icons.sync_rounded, size: 14, color: colorScheme.primary),
+                    ? CircularProgressIndicator(strokeWidth: 2, color: color)
+                    : Icon(icon, size: 14, color: color),
               ),
               const SizedBox(width: 4),
               Text(
-                'Синхр.',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
-                ),
+                isSyncronizing ? 'Синхр.' : label,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: color),
               ),
             ],
           ),

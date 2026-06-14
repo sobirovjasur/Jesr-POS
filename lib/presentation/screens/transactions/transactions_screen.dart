@@ -158,7 +158,8 @@ class _SegmentedTabs extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: i == current ? colorScheme.surface : Colors.transparent,
-                    borderRadius: AppRadius.smallAll,
+                    // Concentric with the outer container (radius 12, padding 4).
+                    borderRadius: BorderRadius.circular(AppRadius.card - 4),
                   ),
                   child: Text(
                     labels[i],

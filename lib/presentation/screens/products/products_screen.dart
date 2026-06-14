@@ -126,7 +126,7 @@ class _SearchBar extends StatelessWidget {
               onChanged: onChanged,
               textInputAction: TextInputAction.search,
               cursorColor: colorScheme.primary,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal),
               decoration: InputDecoration(
                 isCollapsed: true,
                 border: InputBorder.none,
