@@ -8,6 +8,8 @@ class UserEntity extends Equatable {
   final String? gender;
   final String? birthdate;
   final String? imageUrl;
+  final String? branch;
+  final String? cashbox;
   final AuthProvider? authProvider;
   final String? createdAt;
   final String? updatedAt;
@@ -20,6 +22,8 @@ class UserEntity extends Equatable {
     this.gender,
     this.birthdate,
     this.imageUrl,
+    this.branch,
+    this.cashbox,
     this.authProvider,
     this.createdAt,
     this.updatedAt,
@@ -33,6 +37,8 @@ class UserEntity extends Equatable {
     String? gender,
     String? birthdate,
     String? imageUrl,
+    String? branch,
+    String? cashbox,
     AuthProvider? authProvider,
     String? createdAt,
     String? updatedAt,
@@ -45,6 +51,8 @@ class UserEntity extends Equatable {
       gender: gender ?? this.gender,
       birthdate: birthdate ?? this.birthdate,
       imageUrl: imageUrl ?? this.imageUrl,
+      branch: branch ?? this.branch,
+      cashbox: cashbox ?? this.cashbox,
       authProvider: authProvider ?? this.authProvider,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -60,6 +68,8 @@ class UserEntity extends Equatable {
     gender,
     birthdate,
     imageUrl,
+    branch,
+    cashbox,
     authProvider,
     createdAt,
     updatedAt,

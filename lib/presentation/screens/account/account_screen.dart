@@ -155,11 +155,11 @@ class _ProfileHeader extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSizes.padding),
-        const Row(
+        Row(
           children: [
-            Expanded(child: _InfoChip(label: 'Филиал', value: 'Основной')),
-            SizedBox(width: AppSizes.padding / 2),
-            Expanded(child: _InfoChip(label: 'Касса', value: 'Касса 1')),
+            Expanded(child: _InfoChip(label: 'Филиал', value: user?.branch?.isNotEmpty == true ? user!.branch! : '—')),
+            const SizedBox(width: AppSizes.padding / 2),
+            Expanded(child: _InfoChip(label: 'Касса', value: user?.cashbox?.isNotEmpty == true ? user!.cashbox! : '—')),
           ],
         ),
       ],

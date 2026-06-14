@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS '$userTableName' (
     'gender' TEXT,
     'birthdate' TEXT,
     'imageUrl' TEXT,
+    'branch' TEXT,
+    'cashbox' TEXT,
     'authProvider' TEXT,
     'createdAt' DATETIME DEFAULT CURRENT_TIMESTAMP,
     'updatedAt' DATETIME DEFAULT CURRENT_TIMESTAMP,

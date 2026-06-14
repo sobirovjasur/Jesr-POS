@@ -192,6 +192,18 @@ class MockUserModel extends _i1.Mock implements _i7.UserModel {
   );
 
   @override
+  set branch(String? value) => super.noSuchMethod(
+    Invocation.setter(#branch, value),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  set cashbox(String? value) => super.noSuchMethod(
+    Invocation.setter(#cashbox, value),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   set authProvider(String? value) => super.noSuchMethod(
     Invocation.setter(#authProvider, value),
     returnValueForMissingStub: null,
@@ -259,6 +271,8 @@ class MockUserEntity extends _i1.Mock implements _i3.UserEntity {
     String? gender,
     String? birthdate,
     String? imageUrl,
+    String? branch,
+    String? cashbox,
     _i3.AuthProvider? authProvider,
     String? createdAt,
     String? updatedAt,
@@ -272,6 +286,8 @@ class MockUserEntity extends _i1.Mock implements _i3.UserEntity {
               #gender: gender,
               #birthdate: birthdate,
               #imageUrl: imageUrl,
+              #branch: branch,
+              #cashbox: cashbox,
               #authProvider: authProvider,
               #createdAt: createdAt,
               #updatedAt: updatedAt,
@@ -286,6 +302,8 @@ class MockUserEntity extends _i1.Mock implements _i3.UserEntity {
                 #gender: gender,
                 #birthdate: birthdate,
                 #imageUrl: imageUrl,
+                #branch: branch,
+                #cashbox: cashbox,
                 #authProvider: authProvider,
                 #createdAt: createdAt,
                 #updatedAt: updatedAt,

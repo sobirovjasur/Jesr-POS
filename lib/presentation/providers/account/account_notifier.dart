@@ -38,10 +38,12 @@ class AccountNotifier extends AutoDisposeNotifier<AccountFormState> {
         name: res.data?.name,
         email: res.data?.email,
         phone: res.data?.phone,
+        branch: res.data?.branch,
+        cashbox: res.data?.cashbox,
         isLoaded: true,
       );
     } else {
-      throw res.error ?? 'Failed to load data';
+      throw Exception(res.error?.toString() ?? 'Failed to load data');
     }
   }
 
@@ -64,6 +66,8 @@ class AccountNotifier extends AutoDisposeNotifier<AccountFormState> {
         phone: state.phone,
         name: state.name!,
         imageUrl: imageUrl ?? '',
+        branch: state.branch,
+        cashbox: state.cashbox,
       );
 
       var res = await UpateUserUsecase(userRepository).call(user);
@@ -88,5 +92,13 @@ class AccountNotifier extends AutoDisposeNotifier<AccountFormState> {
 
   void onChangedPhone(String value) {
     state = state.copyWith(phone: value);
+  }
+
+  void onChangedBranch(String value) {
+    state = state.copyWith(branch: value);
+  }
+
+  void onChangedCashbox(String value) {
+    state = state.copyWith(cashbox: value);
   }
 }

@@ -6,6 +6,8 @@ class AccountFormState {
   final String? name;
   final String? email;
   final String? phone;
+  final String? branch;
+  final String? cashbox;
   final bool isLoaded;
 
   const AccountFormState({
@@ -14,6 +16,8 @@ class AccountFormState {
     this.name,
     this.email,
     this.phone,
+    this.branch,
+    this.cashbox,
     this.isLoaded = false,
   });
 
@@ -23,6 +27,8 @@ class AccountFormState {
     String? name,
     String? email,
     String? phone,
+    String? branch,
+    String? cashbox,
     bool? isLoaded,
   }) {
     return AccountFormState(
@@ -31,6 +37,8 @@ class AccountFormState {
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      branch: branch ?? this.branch,
+      cashbox: cashbox ?? this.cashbox,
       isLoaded: isLoaded ?? this.isLoaded,
     );
   }

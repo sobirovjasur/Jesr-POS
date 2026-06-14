@@ -10,6 +10,8 @@ class UserModel {
   String? gender;
   String? birthdate;
   String? imageUrl;
+  String? branch;
+  String? cashbox;
   String? authProvider;
   String? createdAt;
   String? updatedAt;
@@ -22,6 +24,8 @@ class UserModel {
     this.gender,
     this.birthdate,
     this.imageUrl,
+    this.branch,
+    this.cashbox,
     this.authProvider,
     this.createdAt,
     this.updatedAt,
@@ -36,6 +40,8 @@ class UserModel {
       gender: json['gender'],
       birthdate: json['birthdate'],
       imageUrl: json['imageUrl'],
+      branch: json['branch'],
+      cashbox: json['cashbox'],
       authProvider: json['authProvider'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
@@ -51,6 +57,8 @@ class UserModel {
       'gender': gender,
       'birthdate': birthdate,
       'imageUrl': imageUrl,
+      'branch': branch,
+      'cashbox': cashbox,
       'authProvider': authProvider,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -66,6 +74,8 @@ class UserModel {
       gender: entity.gender,
       birthdate: entity.birthdate,
       imageUrl: entity.imageUrl,
+      branch: entity.branch,
+      cashbox: entity.cashbox,
       authProvider: entity.authProvider?.value,
       createdAt: entity.createdAt ?? DateTime.now().toIso8601String(),
       updatedAt: entity.updatedAt ?? DateTime.now().toIso8601String(),
@@ -81,6 +91,8 @@ class UserModel {
       gender: gender,
       birthdate: birthdate,
       imageUrl: imageUrl,
+      branch: branch,
+      cashbox: cashbox,
       authProvider: AuthProvider.fromValue(authProvider),
       createdAt: createdAt,
       updatedAt: updatedAt,

@@ -59,6 +59,8 @@ class DatabaseService {
       "ALTER TABLE '${DatabaseConfig.productTableName}' ADD COLUMN 'specifications' TEXT",
       "ALTER TABLE '${DatabaseConfig.productTableName}' ADD COLUMN 'installmentMonths' INTEGER",
       "ALTER TABLE '${DatabaseConfig.productTableName}' ADD COLUMN 'barcode' TEXT",
+      "ALTER TABLE '${DatabaseConfig.userTableName}' ADD COLUMN 'branch' TEXT",
+      "ALTER TABLE '${DatabaseConfig.userTableName}' ADD COLUMN 'cashbox' TEXT",
     ];
 
     for (final sql in alters) {
