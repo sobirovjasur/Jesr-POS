@@ -17,6 +17,7 @@ import '../../presentation/screens/main/main_screen.dart';
 import '../../presentation/screens/products/product_detail_screen.dart';
 import '../../presentation/screens/products/product_form_screen.dart';
 import '../../presentation/screens/products/products_screen.dart';
+import '../../presentation/screens/soon/soon_screen.dart';
 import '../../presentation/screens/transactions/transaction_detail_screen.dart';
 import '../../presentation/screens/transactions/transactions_screen.dart';
 import '../../presentation/screens/welcome/welcome_screen.dart';
@@ -83,8 +84,17 @@ class AppRoutes {
         _register(),
         _registerDetails(),
         _cart(),
+        _soon(),
         _error(),
       ],
+    );
+  }
+
+  GoRoute _soon() {
+    return GoRoute(
+      path: '/soon',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const SoonScreen(),
     );
   }
 
