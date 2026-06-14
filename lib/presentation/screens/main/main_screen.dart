@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di/app_providers.dart';
+import '../../../core/locale/l10n.dart';
 import '../../providers/main/main_notifier.dart';
 import '../welcome/welcome_screen.dart';
 
@@ -98,11 +99,11 @@ class _BottomNav extends StatelessWidget {
 
   const _BottomNav({required this.currentIndex, required this.onTap});
 
-  static const List<({IconData icon, String label})> _items = [
-    (icon: Icons.point_of_sale_rounded, label: 'Главная'),
-    (icon: Icons.grid_view_rounded, label: 'Товары'),
-    (icon: Icons.receipt_long_rounded, label: 'Чеки'),
-    (icon: Icons.person_rounded, label: 'Профиль'),
+  static const List<({IconData icon, String labelKey})> _items = [
+    (icon: Icons.point_of_sale_rounded, labelKey: 'nav_home'),
+    (icon: Icons.grid_view_rounded, labelKey: 'nav_products'),
+    (icon: Icons.receipt_long_rounded, labelKey: 'nav_receipts'),
+    (icon: Icons.person_rounded, labelKey: 'nav_profile'),
   ];
 
   @override
@@ -135,7 +136,7 @@ class _BottomNav extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _items[i].label,
+                          context.tr(_items[i].labelKey),
                           style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: i == currentIndex ? colorScheme.primary : colorScheme.onSurfaceVariant,

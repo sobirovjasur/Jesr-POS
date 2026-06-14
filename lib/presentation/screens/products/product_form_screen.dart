@@ -37,6 +37,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
   final stockController = TextEditingController();
+  final barcodeController = TextEditingController();
   final installmentController = TextEditingController();
   final specsController = TextEditingController();
   final descController = TextEditingController();
@@ -50,7 +51,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       final notifier = ref.read(productFormNotifierProvider.notifier);
       await notifier.initProductForm(widget.id);
 
-      // Carry a scanned barcode into the new product (stored silently).
+      // Carry a scanned barcode into the new product.
       if (widget.barcode != null && widget.barcode!.isNotEmpty) {
         notifier.onChangedBarcode(widget.barcode!);
       }
@@ -59,6 +60,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       nameController.text = state.name ?? '';
       priceController.text = state.price?.toString() ?? '';
       stockController.text = state.stock?.toString() ?? '';
+      barcodeController.text = state.barcode ?? '';
       installmentController.text = state.installmentMonths?.toString() ?? '';
       specsController.text = state.specifications ?? '';
       descController.text = state.description ?? '';
@@ -70,6 +72,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     nameController.dispose();
     priceController.dispose();
     stockController.dispose();
+    barcodeController.dispose();
     installmentController.dispose();
     specsController.dispose();
     descController.dispose();
@@ -209,6 +212,14 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: notifier.onChangedStock,
+                        ),
+                        const SizedBox(height: AppSizes.padding),
+                        AppTextField(
+                          controller: barcodeController,
+                          labelText: 'Штрих-код',
+                          hintText: 'Отсканируйте или введите',
+                          keyboardType: TextInputType.number,
+                          onChanged: notifier.onChangedBarcode,
                         ),
                         const SizedBox(height: AppSizes.padding),
                         AppTextField(

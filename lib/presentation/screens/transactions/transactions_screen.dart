@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../../domain/entities/transaction_entity.dart';
@@ -55,7 +56,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Чеки'), elevation: 0, scrolledUnderElevation: 0),
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        title: Text(context.tr('receipts_title'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+      ),
       body: Column(
         children: [
           Padding(

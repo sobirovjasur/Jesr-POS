@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/locale/l10n.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
@@ -65,10 +66,10 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Товары'),
+        centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
-        actions: const [_AddButton()],
+        title: Text(context.tr('products_title'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
       ),
       body: Column(
         children: [
@@ -94,6 +95,16 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     isLoadingMore: isLoadingMore,
                     onRefresh: () => ref.read(productsNotifierProvider.notifier).getAllProducts(),
                   ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding / 2, AppSizes.padding, AppSizes.padding),
+            child: AppButton(
+              text: 'Добавить',
+              width: double.infinity,
+              height: 52,
+              fontSize: 18,
+              onTap: () => context.push('/products/product-create'),
+            ),
           ),
         ],
       ),
@@ -282,13 +293,9 @@ class _ProductGrid extends StatelessWidget {
             if (products == null)
               const SliverFillRemaining(hasScrollBody: false, child: AppProgressIndicator())
             else if (products!.isEmpty)
-              SliverFillRemaining(
+              const SliverFillRemaining(
                 hasScrollBody: false,
-                child: AppEmptyState(
-                  subtitle: 'Нет товаров, добавьте товар',
-                  buttonText: 'Добавить товар',
-                  onTapButton: () => context.push('/products/product-create'),
-                ),
+                child: AppEmptyState(subtitle: 'Нет товаров, добавьте товар'),
               )
             else
               SliverPadding(
@@ -315,33 +322,3 @@ class _ProductGrid extends StatelessWidget {
   }
 }
 
-class _AddButton extends StatelessWidget {
-  const _AddButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: AppSizes.padding),
-      child: AppButton(
-        height: 28,
-        borderRadius: AppRadius.smallAll,
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.padding / 1.5),
-        buttonColor: Theme.of(context).colorScheme.surfaceContainerLow,
-        child: Row(
-          children: [
-            Icon(Icons.add_rounded, size: 16, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: AppSizes.padding / 4),
-            Text(
-              'Добавить',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ],
-        ),
-        onTap: () => context.push('/products/product-create'),
-      ),
-    );
-  }
-}
