@@ -1,19 +1,17 @@
 import 'package:app_image/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/themes/app_radius.dart';
 import '../../../core/themes/app_sizes.dart';
 import '../../providers/home/home_notifier.dart';
 import '../../providers/main/main_notifier.dart';
 import '../../providers/products/products_notifier.dart';
+import '../../widgets/app_button.dart';
 import '../../widgets/app_empty_state.dart';
 import '../../widgets/app_loading_more_indicator.dart';
 import '../../widgets/app_progress_indicator.dart';
-import 'components/cart_panel_body.dart';
-import 'components/cart_panel_footer.dart';
-import 'components/cart_panel_header.dart';
 import 'components/home_product_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -25,7 +23,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final scrollController = ScrollController();
-  final panelController = PanelController();
 
   @override
   void initState() {
@@ -56,53 +53,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final homeNotifier = ref.read(homeNotifierProvider.notifier);
-
     return Scaffold(
-      body: SlidingUpPanel(
-        controller: panelController,
-        minHeight: 88,
-        maxHeight: AppSizes.screenHeight(context) - AppSizes.appBarHeight() - AppSizes.viewPadding(context).top,
-        color: Theme.of(context).colorScheme.surfaceContainerLowest,
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.04),
-            offset: const Offset(0, -4),
-            blurRadius: 12,
-          ),
-        ],
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(AppRadius.sheetLarge),
-          topRight: Radius.circular(AppRadius.sheetLarge),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            const _Header(),
+            Expanded(
+              child: _ProductGrid(scrollController: scrollController, onRefresh: onRefresh),
+            ),
+            const _CartBar(),
+          ],
         ),
-        body: _Body(scrollController: scrollController, onRefresh: onRefresh),
-        header: CartPanelHeader(panelController: panelController),
-        panel: CartPanelBody(panelController: panelController),
-        footer: CartPanelFooter(panelController: panelController),
-        onPanelOpened: () => homeNotifier.onChangedIsPanelExpanded(true),
-        onPanelClosed: () => homeNotifier.onChangedIsPanelExpanded(false),
       ),
     );
   }
 }
 
-class _Body extends StatelessWidget {
-  final ScrollController scrollController;
-  final Future<void> Function() onRefresh;
-
-  const _Body({required this.scrollController, required this.onRefresh});
+class _CartBar extends ConsumerWidget {
+  const _CartBar();
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Column(
-        children: [
-          const _Header(),
-          Expanded(
-            child: _ProductGrid(scrollController: scrollController, onRefresh: onRefresh),
-          ),
-        ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasItems = ref.watch(homeNotifierProvider.select((s) => s.orderedProducts.isNotEmpty));
+
+    if (!hasItems) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.padding),
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      child: AppButton(
+        text: 'Перейти в корзину',
+        width: double.infinity,
+        height: 52,
+        fontSize: 18,
+        onTap: () => context.push('/cart'),
       ),
     );
   }

@@ -1,0 +1,288 @@
+import 'package:app_image/app_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/themes/app_colors.dart';
+import '../../../core/themes/app_radius.dart';
+import '../../../core/themes/app_sizes.dart';
+import '../../../core/utilities/currency_formatter.dart';
+import '../../../domain/entities/ordered_product_entity.dart';
+import '../../providers/home/home_notifier.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_dialog.dart';
+import '../../widgets/app_empty_state.dart';
+import 'components/checkout_dialog.dart';
+
+/// Cart screen (Figma 07/08 — "Корзина").
+class CartScreen extends ConsumerWidget {
+  const CartScreen({super.key});
+
+  void _confirmClearAll(WidgetRef ref) {
+    AppDialog.show(
+      title: 'Внимание',
+      text: 'Хотите очистить все товары?',
+      leftButtonText: 'Нет',
+      rightButtonText: 'Да',
+      onTapRightButton: (context) {
+        ref.read(homeNotifierProvider.notifier).onRemoveAllOrderedProduct();
+        context.pop();
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(homeNotifierProvider.select((s) => s.orderedProducts));
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final total = items.fold<int>(0, (sum, e) => sum + e.price * e.quantity);
+
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Корзина', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: items.isEmpty
+          ? const AppEmptyState(title: 'Корзина пуста', subtitle: 'Добавьте товары на главном экране')
+          : Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSizes.padding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: AppRadius.cardAll,
+                            border: Border.all(color: colorScheme.surfaceContainerHighest, width: 1),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  AppSizes.padding,
+                                  AppSizes.padding / 1.5,
+                                  AppSizes.padding / 2,
+                                  AppSizes.padding / 1.5,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Корзина', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+                                    IconButton(
+                                      icon: Icon(Icons.delete_outline_rounded, color: colorScheme.error),
+                                      onPressed: () => _confirmClearAll(ref),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              for (var i = 0; i < items.length; i++) ...[
+                                Divider(height: 1, color: colorScheme.surfaceContainerHighest),
+                                _CartItemTile(item: items[i], index: i),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSizes.padding),
+                        _SummaryRow(label: 'Товары (${items.length})', value: CurrencyFormatter.withoutSymbol(total)),
+                        const SizedBox(height: AppSizes.padding / 2),
+                        _SummaryRow(label: 'Итого к оплате', value: CurrencyFormatter.withoutSymbol(total), bold: true),
+                        const SizedBox(height: AppSizes.padding),
+                        AppButton(
+                          text: 'Отложить',
+                          width: double.infinity,
+                          height: 50,
+                          buttonColor: colorScheme.surfaceContainerLow,
+                          borderColor: colorScheme.surfaceContainerLow,
+                          textColor: colorScheme.onSurface,
+                          onTap: () => context.pop(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(AppSizes.padding),
+                  color: colorScheme.surfaceContainerLowest,
+                  child: AppButton(
+                    text: 'Оплата',
+                    width: double.infinity,
+                    height: 52,
+                    fontSize: 18,
+                    onTap: () => CheckoutDialog.show(),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool bold;
+
+  const _SummaryRow({required this.label, required this.value, this.bold = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: textTheme.bodyMedium?.copyWith(
+            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            color: bold ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+          ),
+        ),
+        Text(
+          value,
+          style: (bold ? textTheme.titleMedium : textTheme.bodyLarge)?.copyWith(fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+}
+
+class _CartItemTile extends ConsumerWidget {
+  final OrderedProductEntity item;
+  final int index;
+
+  const _CartItemTile({required this.item, required this.index});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final notifier = ref.read(homeNotifierProvider.notifier);
+
+    return Padding(
+      padding: const EdgeInsets.all(AppSizes.padding / 1.5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppImage(
+            image: item.imageUrl,
+            width: 48,
+            height: 48,
+            fit: BoxFit.contain,
+            borderRadius: AppRadius.smallAll,
+            backgroundColor: AppColors.imageBackground,
+            errorWidget: Icon(Icons.image, color: colorScheme.surfaceDim, size: 20),
+          ),
+          const SizedBox(width: AppSizes.padding / 1.5),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  CurrencyFormatter.withoutSymbol(item.price * item.quantity),
+                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '${CurrencyFormatter.format(item.price)}/шт',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: AppSizes.padding / 2),
+                _QuantityStepper(
+                  quantity: item.quantity,
+                  onDecrement: () {
+                    if (item.quantity > 1) {
+                      notifier.onChangedOrderedProductQuantity(index, item.quantity - 1);
+                    } else {
+                      notifier.onRemoveOrderedProduct(item);
+                    }
+                  },
+                  onIncrement: () {
+                    if (item.quantity < item.stock) {
+                      notifier.onChangedOrderedProductQuantity(index, item.quantity + 1);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.more_vert_rounded, color: colorScheme.onSurfaceVariant),
+            onPressed: () => notifier.onRemoveOrderedProduct(item),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuantityStepper extends StatelessWidget {
+  final int quantity;
+  final VoidCallback onDecrement;
+  final VoidCallback onIncrement;
+
+  const _QuantityStepper({required this.quantity, required this.onDecrement, required this.onIncrement});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        _StepperButton(icon: Icons.remove_rounded, onTap: onDecrement),
+        SizedBox(
+          width: 44,
+          child: Text(
+            '$quantity',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
+        _StepperButton(icon: Icons.add_rounded, onTap: onIncrement, color: colorScheme.primary),
+      ],
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const _StepperButton({required this.icon, required this.onTap, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colorScheme.surfaceContainerLow,
+      borderRadius: AppRadius.smallAll,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.smallAll,
+        child: SizedBox(
+          width: 34,
+          height: 34,
+          child: Icon(icon, size: 18, color: color ?? colorScheme.onSurface),
+        ),
+      ),
+    );
+  }
+}
