@@ -1,3 +1,4 @@
 {
-    "GOOGLE_SERVER_CLIENT_ID": "xxxxxxxxxxxxx.apps.googleusercontent.com"
+    "GOOGLE_SERVER_CLIENT_ID": "xxxxxxxxxxxxx.apps.googleusercontent.com",
+    "REMOVE_BG_API_KEY": "your-remove-bg-api-key"
 }
