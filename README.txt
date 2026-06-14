@@ -1,5 +1,5 @@
 ==============================================================
-  JESR POS
+JESR MOBILE APP POS SYSTEM
 ==============================================================
 
 LOYIHA HAQIDA
@@ -64,6 +64,3 @@ ISHGA TUSHIRISH
 ---------------
   flutter pub get
   flutter run --dart-define-from-file=config.json
-
-Eslatma: config.json fayli API kalitlarini saqlaydi va repozitoriyga
-qo'shilmaydi (gitignore'da). Namuna uchun config.example.json ga qarang.
