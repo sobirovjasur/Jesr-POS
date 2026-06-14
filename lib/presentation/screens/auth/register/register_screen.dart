@@ -7,10 +7,14 @@ import '../../../../core/themes/app_sizes.dart';
 import '../../../providers/auth/auth_notifier.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_dialog.dart';
-import '../../../widgets/app_text_field.dart';
-import '../components/auth_password_field.dart';
 import '../components/auth_phone_field.dart';
+import 'components/onboarding_text_field.dart';
 
+/// Registration step 04 — user details (Figma: "Введите свои данные").
+///
+/// Keeps the inputs required for phone+password auth (name, password, confirm)
+/// while adopting the new onboarding input style. The phone number is carried
+/// from the previous step via [phone].
 class RegisterScreen extends ConsumerStatefulWidget {
   /// Full phone number (`+998...`) carried from the phone-entry step. When
   /// provided, the phone field is hidden and this value is used for sign-up.
@@ -50,10 +54,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _confirmController.text.isNotEmpty;
 
   String? _validate() {
-    if (_nameController.text.trim().isEmpty) return 'Please enter your name.';
-    if (!_hasPhone) return 'Please enter a valid phone number.';
-    if (_passwordController.text.length < 6) return 'Password must be at least 6 characters.';
-    if (_passwordController.text != _confirmController.text) return 'Passwords do not match.';
+    if (_nameController.text.trim().isEmpty) return 'Введите имя';
+    if (!_hasPhone) return 'Введите номер телефона';
+    if (_passwordController.text.length < 6) return 'Пароль должен содержать не менее 6 символов';
+    if (_passwordController.text != _confirmController.text) return 'Пароли не совпадают';
 
     return null;
   }
@@ -79,106 +83,112 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (res.isSuccess) {
       ref.read(appRoutesProvider).router.refresh();
     } else {
-      _errorNotifier.value = res.error?.toString() ?? 'Registration failed. Please try again.';
+      _errorNotifier.value = res.error?.toString() ?? 'Не удалось зарегистрироваться. Попробуйте ещё раз.';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Create account')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSizes.padding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppTextField(
-                controller: _nameController,
-                labelText: 'Full name',
-                hintText: 'Enter your name',
-                textInputAction: TextInputAction.next,
-              ),
-              if (widget.phone == null) ...[
-                const SizedBox(height: AppSizes.padding),
-                AuthPhoneField(
-                  controller: _phoneController,
-                  labelText: 'Phone number',
-                ),
-              ],
-              const SizedBox(height: AppSizes.padding),
-              AuthPasswordField(
-                controller: _passwordController,
-                labelText: 'Password',
-                hintText: 'At least 6 characters',
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: AppSizes.padding),
-              AuthPasswordField(
-                controller: _confirmController,
-                labelText: 'Confirm password',
-                hintText: 'Re-enter password',
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _onSubmit,
-              ),
-              const SizedBox(height: AppSizes.padding * 1.5),
-              ValueListenableBuilder<String?>(
-                valueListenable: _errorNotifier,
-                builder: (context, error, _) {
-                  if (error == null) return const SizedBox.shrink();
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSizes.padding / 2),
-                    child: Text(
-                      error,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => context.pop(),
+        ),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(AppSizes.padding, AppSizes.padding / 2, AppSizes.padding, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Введите свои данные',
+                      style: textTheme.displayLarge?.copyWith(fontSize: 28, fontWeight: FontWeight.bold, height: 1.3),
                     ),
-                  );
-                },
+                    const SizedBox(height: AppSizes.padding * 1.5),
+                    OnboardingTextField(
+                      controller: _nameController,
+                      label: 'Имя',
+                      hint: 'Введите',
+                      textInputAction: TextInputAction.next,
+                    ),
+                    if (widget.phone == null) ...[
+                      const SizedBox(height: AppSizes.padding),
+                      AuthPhoneField(controller: _phoneController, labelText: 'Номер телефона'),
+                    ],
+                    const SizedBox(height: AppSizes.padding),
+                    OnboardingTextField(
+                      controller: _passwordController,
+                      label: 'Пароль',
+                      hint: 'Введите пароль',
+                      isPassword: true,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: AppSizes.padding),
+                    OnboardingTextField(
+                      controller: _confirmController,
+                      label: 'Подтвердите пароль',
+                      hint: 'Повторите пароль',
+                      isPassword: true,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: _onSubmit,
+                    ),
+                  ],
+                ),
               ),
-              ListenableBuilder(
-                listenable: Listenable.merge([
-                  _nameController,
-                  _phoneController,
-                  _passwordController,
-                  _confirmController,
-                ]),
-                builder: (context, _) {
-                  return AppButton(
-                    text: 'Register',
-                    width: double.infinity,
-                    height: 48,
-                    enabled: _isFilled,
-                    onTap: _onSubmit,
-                  );
-                },
-              ),
-              const SizedBox(height: AppSizes.padding / 2),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSizes.padding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Already have an account?',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  ValueListenableBuilder<String?>(
+                    valueListenable: _errorNotifier,
+                    builder: (context, error, _) {
+                      if (error == null) return const SizedBox.shrink();
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSizes.padding / 2),
+                        child: Text(
+                          error,
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                        ),
+                      );
+                    },
                   ),
-                  TextButton(
-                    onPressed: () => context.pop(),
-                    child: Text(
-                      'Sign in',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
+                  ListenableBuilder(
+                    listenable: Listenable.merge([
+                      _nameController,
+                      _phoneController,
+                      _passwordController,
+                      _confirmController,
+                    ]),
+                    builder: (context, _) {
+                      return AppButton(
+                        text: 'Подтвердить',
+                        width: double.infinity,
+                        height: 52,
+                        fontSize: 18,
+                        enabled: _isFilled,
+                        disabledButtonColor: colorScheme.surfaceContainerLow,
+                        onTap: _onSubmit,
+                      );
+                    },
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
