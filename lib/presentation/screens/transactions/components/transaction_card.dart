@@ -9,6 +9,7 @@ import '../../../../core/utilities/currency_formatter.dart';
 import '../../../../core/utilities/date_time_formatter.dart';
 import '../../../../domain/entities/transaction_entity.dart';
 import '../../../providers/home/home_notifier.dart';
+import '../../../providers/main/main_notifier.dart';
 
 /// Status label + color for a transaction (Продан / Возвращен / Отложенный).
 ({String label, Color color}) transactionStatusInfo(String status) {
@@ -32,7 +33,12 @@ class TransactionCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final status = transactionStatusInfo(transaction.status);
+
+    // While offline, data isn't synced yet — surface every receipt as pending.
+    final isOnline = ref.watch(mainNotifierProvider.select((s) => s.isHasInternet));
+    final status = isOnline
+        ? transactionStatusInfo(transaction.status)
+        : (label: 'В процессе', color: AppColors.textSecondary);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSizes.padding),
